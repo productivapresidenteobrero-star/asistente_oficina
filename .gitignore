@@ -1,0 +1,43 @@
+# Sensitive / secrets
+.env
+credentials.json
+credentials/*.json
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Virtual environment
+venv/
+venv_old/
+__pycache__/
+*.pyc
+
+# Generated / media files
+media/actas/*
+media/photos/*
+informes/*
+cartas/*
+!media/actas/.gitkeep
+!media/photos/.gitkeep
+!informes/.gitkeep
+!cartas/.gitkeep
+
+# Backups / zips
+*.zip
+*.gz
+*.rar
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log

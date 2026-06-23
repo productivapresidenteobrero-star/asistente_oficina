@@ -1,0 +1,50 @@
+# === Asistente Comunal - Comuna Productiva Presidente Obrero ===
+# Servidor y API
+fastapi
+uvicorn[standard]
+python-multipart
+python-dotenv
+pydantic==2.11.3
+
+# Base de datos
+aiosqlite==0.21.0
+
+# Procesamiento de documentos
+PyMuPDF==1.25.5
+pdfplumber==0.11.6
+python-docx==1.1.2
+openpyxl==3.1.5
+xlrd>=2.0.1
+pandas==2.3.0
+Pillow==11.2.1
+
+# OCR
+pytesseract==0.3.13
+
+# Búsqueda Vectorial (Desactivado para Python 3.13 por falta de pre-compilados C++)
+# chromadb
+# sentence-transformers
+
+# IA - APIs gratuitas
+openai==1.55.3
+groq==0.25.0
+google-genai==1.14.0
+cohere==5.15.0
+huggingface-hub==0.32.4
+
+# Google Calendar
+google-auth==2.40.3
+google-auth-oauthlib==1.2.1
+google-api-python-client==2.172.0
+
+# Telegram Bot
+python-telegram-bot[job-queue]==22.1
+APScheduler==3.10.4
+
+# Generación de informes (WeasyPrint desactivado — requiere GTK en Windows)
+# WeasyPrint==65.0
+matplotlib==3.10.3
+
+# Utilidades
+httpx==0.28.1
+aiofiles==24.1.0

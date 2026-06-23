@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Informe de Gestión Comunal</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 2.5cm 2cm;
+            @top-center {
+                content: element(header);
+            }
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #2d3748;
+            font-size: 11pt;
+            line-height: 1.6;
+        }
+        
+        div.header {
+            position: running(header);
+            border-bottom: 2px solid #2b6cb0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .header-title {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #2b6cb0;
+            text-transform: uppercase;
+        }
+        
+        .header-sub {
+            font-size: 9pt;
+            color: #718096;
+        }
+        
+        div.footer {
+            position: running(footer);
+            border-top: 1px solid #e2e8f0;
+            padding-top: 5px;
+            font-size: 8pt;
+            color: #718096;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .titulo-informe {
+            text-align: center;
+            font-size: 20pt;
+            font-weight: bold;
+            color: #1a365d;
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .periodo-informe {
+            text-align: center;
+            font-size: 11pt;
+            color: #4a5568;
+            margin-bottom: 30px;
+        }
+        
+        /* Tarjetas de estadísticas estilo premium */
+        .grid-stats {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+            border-spacing: 15px 0;
+        }
+        
+        .card-stat {
+            display: table-cell;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            width: 33%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        
+        .card-val {
+            font-size: 22pt;
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+        
+        .card-lbl {
+            font-size: 9pt;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .seccion-grafico {
+            text-align: center;
+            margin: 30px 0;
+            page-break-inside: avoid;
+        }
+        
+        .seccion-grafico img {
+            max-width: 90%;
+            height: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .titulo-seccion {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #2b6cb0;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .actividad-item {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #edf2f7;
+            page-break-inside: avoid;
+        }
+        
+        .actividad-meta {
+            font-size: 9.5pt;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+        
+        .badge-cat {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 8.5pt;
+        }
+        
+        .actividad-desc {
+            text-align: justify;
+            font-size: 10pt;
+            color: #2d3748;
+        }
+        
+        .actividad-fotos {
+            margin-top: 12px;
+        }
+        
+        .actividad-fotos img {
+            max-width: 200px;
+            max-height: 150px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <span class="header-title">Comuna Productiva Presidente Obrero</span> - 
+        <span class="header-sub">Informe Oficial de Gestión y Actividades</span>
+    </div>
+
+    <div class="footer">
+        Comuna Productiva Presidente Obrero - Reporte generado automáticamente el 07/06/2026 11:37 PM
+    </div>
+
+    <div class="titulo-informe">Informe de Actividades</div>
+    <div class="periodo-informe">Período: Desde 2026-05-31 hasta 2026-06-07 (Semanal)</div>
+
+    <div class="grid-stats">
+        <div class="card-stat">
+            <div class="card-val">2</div>
+            <div class="card-lbl">Actividades Realizadas</div>
+        </div>
+        <div class="card-stat">
+            <div class="card-val">2517</div>
+            <div class="card-lbl">Participantes Totales</div>
+        </div>
+        <div class="card-stat">
+            <div class="card-val">1258.5</div>
+            <div class="card-lbl">Prom. Participantes / Act.</div>
+        </div>
+    </div>
+
+    
+                <div class="seccion-grafico">
+                    <img src="/media/chart_report_semanal_20260607_233758.png" alt="Estadísticas de Actividades">
+                </div>
+                
+
+    <div class="page-break"></div>
+
+    <div class="titulo-seccion">Detalle de Actividades Realizadas</div>
+    
+    
+            <div class="actividad-item">
+                <div class="actividad-meta">
+                    <strong>Fecha:</strong> 06/06/2026 | 
+                    <span class="badge-cat">Jornada</span> | 
+                    <strong>Participantes:</strong> 1300
+                </div>
+                <div class="actividad-desc">
+                    Jornada Medico Social, donde  fueron dispensadas mas de 1000 atenciones a los habitantes de la Comuna Productiva Presidente Obrero, realizada en la U.E. Mauricio Enciniso
+                </div>
+                <div class="actividad-fotos"><img src="/media/web_20260605_212438.jpeg"><img src="/media/web_20260605_212438.jpeg"><img src="/media/web_20260605_212438.jpeg"><img src="/media/web_20260605_212438.jpeg"></div>
+            </div>
+            
+            <div class="actividad-item">
+                <div class="actividad-meta">
+                    <strong>Fecha:</strong> 05/06/2026 | 
+                    <span class="badge-cat">Jornada</span> | 
+                    <strong>Participantes:</strong> 1217
+                </div>
+                <div class="actividad-desc">
+                    Jornada Medico Social, donde fueron dispensadas mas de 1217 atenciones a los habitantes de la Comuna Productiva Presidente Obrero, realizada en la U.E. Mauricio Encinoso
+                </div>
+                <div class="actividad-fotos"><img src="/media/web_20260607_110553.jpeg"><img src="/media/web_20260607_110553.jpeg"><img src="/media/web_20260607_110553.jpeg"><img src="/media/web_20260607_110553.jpeg"><img src="/media/web_20260607_110553.jpeg"></div>
+            </div>
+            
+
+</body>
+</html>

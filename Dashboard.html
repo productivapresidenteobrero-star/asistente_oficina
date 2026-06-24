@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Asistente Comunal - Dashboard</title>
+<!-- Google Fonts: Geist for typography, Material Symbols for icons -->
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#00174b",
+                        "outline-variant": "#c3c6d7",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#b4c5ff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-tint": "#0053db",
+                        "secondary-container": "#d0e1fb",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "inverse-surface": "#283044",
+                        "on-surface": "#131b2e",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#dae2fd",
+                        "surface-container-high": "#e2e7ff",
+                        "tertiary": "#515659",
+                        "on-tertiary-container": "#edf1f5",
+                        "on-surface-variant": "#434655",
+                        "on-secondary-container": "#54647a",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c3c7cb",
+                        "secondary": "#505f76",
+                        "surface-container-low": "#f2f3ff",
+                        "background": "#faf8ff",
+                        "primary-fixed": "#dbe1ff",
+                        "outline": "#737686",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-tertiary-fixed-variant": "#43474b",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-dim": "#d2d9f4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#2563eb",
+                        "on-primary": "#ffffff",
+                        "primary": "#004ac6",
+                        "tertiary-fixed": "#dfe3e7",
+                        "surface-variant": "#dae2fd",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary-fixed": "#171c1f",
+                        "on-background": "#131b2e",
+                        "surface-container": "#eaedff",
+                        "surface-bright": "#faf8ff",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#696e71",
+                        "inverse-on-surface": "#eef0ff",
+                        "surface": "#faf8ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xxl": "48px",
+                        "unit": "8px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "container-padding": "32px",
+                        "gutter": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Geist"],
+                        "label-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "body-sm": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "body-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "headline-lg-mobile": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Geist', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-header {
+            backdrop-filter: blur(12px);
+            background: rgba(250, 248, 255, 0.85);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .tonal-surface { 
+            background-color: #ffffff; 
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03); 
+        }
+        .ghost-border { border: 1px solid #eaedff; }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="glass-header docked full-width top-0 z-40 border-b border-outline-variant transition-colors duration-200 ease-in-out flex justify-between items-center w-full px-md h-16 sticky top-0">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a community manager in their 40s, looking friendly and capable, in a modern office with soft architectural lighting that complements the light mode UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzSYGRDtcMeopQIEcfMHjg3eKuQn9d_E_zG_3zYfHofgVU3Ax-7yLOH4W5gaeT2sjDH6ignHWnqIn861BKtMk82Hwyn87w_Lz7bJ5TzrqRLosAdsfpe22fJQ4rWAInoE7Xj_Jdmjql794aWudL6-Uvk-bOoyZg09wg73xtuFxksj-PYJh0tOuvZVG_0cAwcko0RMqkX2ZfxDhabO9fArldW0lbHZ_KNbPjv6GQX7lii3UoAyYz2XUjBn-EmhEmeD2MOA_LlbUeFg"/>
+</div>
+<div class="flex flex-col">
+<h1 class="text-on-surface font-headline-md text-[18px] font-bold">Dashboard General</h1>
+<p class="text-on-surface-variant font-label-md text-[10px]">Vista consolidada de gestión</p>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-primary hover:bg-surface-container-low transition-colors duration-200 ease-in-out">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<main class="px-md pt-lg flex flex-col gap-lg max-w-md mx-auto">
+<!-- Metric Cards: Horizontal Scroll -->
+<section>
+<div class="flex gap-md overflow-x-auto no-scrollbar pb-sm -mx-md px-md">
+<!-- Card 1: Activities -->
+<div class="min-w-[160px] tonal-surface ghost-border rounded-xl p-md flex flex-col gap-sm">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-primary">dashboard</span>
+</div>
+<div class="flex flex-col">
+<span class="text-display-lg text-primary text-[32px] font-bold">0</span>
+<span class="text-on-surface-variant font-label-md uppercase tracking-wider">Actividades</span>
+</div>
+</div>
+<!-- Card 2: Participants -->
+<div class="min-w-[160px] tonal-surface ghost-border rounded-xl p-md flex flex-col gap-sm">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-secondary">group</span>
+</div>
+<div class="flex flex-col">
+<span class="text-display-lg text-secondary text-[32px] font-bold">0</span>
+<span class="text-on-surface-variant font-label-md uppercase tracking-wider">Participantes</span>
+</div>
+</div>
+<!-- Card 3: Letters -->
+<div class="min-w-[160px] tonal-surface ghost-border rounded-xl p-md flex flex-col gap-sm">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-tertiary">folder_open</span>
+</div>
+<div class="flex flex-col">
+<span class="text-display-lg text-tertiary text-[32px] font-bold">2</span>
+<span class="text-on-surface-variant font-label-md uppercase tracking-wider">Cartas 2026</span>
+</div>
+</div>
+<!-- Card 4: Pending -->
+<div class="min-w-[160px] tonal-surface ghost-border rounded-xl p-md flex flex-col gap-sm">
+<div class="flex items-center justify-between">
+<span class="material-symbols-outlined text-error">poll</span>
+</div>
+<div class="flex flex-col">
+<span class="text-display-lg text-error text-[32px] font-bold">0</span>
+<span class="text-on-surface-variant font-label-md uppercase tracking-wider">Pendientes</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Activities by Category Chart Placeholder -->
+<section class="tonal-surface ghost-border rounded-xl p-lg">
+<div class="flex items-center justify-between mb-lg">
+<h2 class="text-on-surface font-headline-md text-[18px]">Actividades por Categoría</h2>
+<a class="text-primary font-label-md hover:underline" href="#">Ver todo</a>
+</div>
+<div class="h-40 w-full flex items-end gap-md px-sm border-b border-outline-variant">
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[20%] transition-all hover:bg-primary-container/20"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[40%] transition-all hover:bg-primary-container/20"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[15%] transition-all hover:bg-primary-container/20"></div>
+<div class="flex-1 bg-primary/40 rounded-t-lg h-[60%] transition-all hover:bg-primary-container/20"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg h-[30%] transition-all hover:bg-primary-container/20"></div>
+</div>
+<p class="text-on-surface-variant text-center font-body-sm mt-md">Últimos 30 días</p>
+</section>
+<!-- Next Tasks / Empty State -->
+<section class="tonal-surface ghost-border rounded-xl p-lg flex flex-col items-center text-center">
+<div class="w-full flex items-center justify-between mb-xxl">
+<h2 class="text-on-surface font-headline-md text-[18px]">Próximas Tareas</h2>
+<button class="text-primary font-label-md">Ver agenda</button>
+</div>
+<div class="py-xl">
+<div class="w-24 h-24 mb-md mx-auto opacity-10 text-primary">
+<span class="material-symbols-outlined text-[96px]" style="font-variation-settings: 'wght' 200;">calendar_today</span>
+</div>
+<h3 class="text-on-surface font-headline-md text-[16px] mb-xs">Sin tareas pendientes</h3>
+<p class="text-on-surface-variant font-body-sm">Tu agenda está despejada por ahora.</p>
+</div>
+</section>
+<!-- Quick Directory Search -->
+<section class="bg-surface-container-low ghost-border rounded-xl p-lg shadow-sm">
+<h2 class="text-on-surface font-headline-md text-[16px] mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">search</span>
+                Directorio Rápido de Voceros
+            </h2>
+<div class="relative mb-lg">
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-on-surface font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-on-surface-variant/50" placeholder="Nombre o cédula..." type="text"/>
+</div>
+<div class="flex flex-wrap gap-sm">
+<span class="bg-surface-container-highest border border-outline-variant text-on-surface-variant px-md py-xs rounded-full text-[12px] font-label-md cursor-pointer hover:bg-primary hover:text-on-primary transition-colors">Legislativo</span>
+<span class="bg-surface-container-highest border border-outline-variant text-on-surface-variant px-md py-xs rounded-full text-[12px] font-label-md cursor-pointer hover:bg-primary hover:text-on-primary transition-colors">Ejecutivo</span>
+<span class="bg-surface-container-highest border border-outline-variant text-on-surface-variant px-md py-xs rounded-full text-[12px] font-label-md cursor-pointer hover:bg-primary hover:text-on-primary transition-colors">Contraloría</span>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-sm px-md pb-safe bg-surface-container-lowest border-t border-outline-variant z-50 rounded-t-xl shadow-lg transition-all duration-200">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary rounded-full px-4 py-1 active:scale-95 transition-transform duration-150 shadow-md shadow-primary/20" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-label-md font-label-md mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-label-md font-label-md mt-1">Censo</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="text-label-md font-label-md mt-1">Archivos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">poll</span>
+<span class="text-label-md font-label-md mt-1">Consultas</span>
+</a>
+</nav>
+<!-- Mobile-only FAB (Floating Action Button) - Consistent with Material 3 Light -->
+<button class="fixed right-lg bottom-24 w-14 h-14 bg-primary text-on-primary rounded-xl shadow-xl flex items-center justify-center active:scale-90 transition-transform z-40 border border-primary-container">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+<script>
+        // Micro-interaction for the search bar
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+    </script>
+</body></html>

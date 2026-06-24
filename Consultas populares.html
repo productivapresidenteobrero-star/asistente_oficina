@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Asistente Comunal - Consultas Populares</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Geist', sans-serif;
+            background-color: #faf8ff;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-header {
+            background: rgba(250, 248, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .tonal-surface { 
+            background-color: #ffffff; 
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); 
+        }
+        .ghost-border { border: 1px solid #e2e7ff; }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f2f3ff;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d2d9f4;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#00174b",
+                        "outline-variant": "#c3c6d7",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#b4c5ff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-tint": "#0053db",
+                        "secondary-container": "#d0e1fb",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "inverse-surface": "#283044",
+                        "on-surface": "#131b2e",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#dae2fd",
+                        "surface-container-high": "#e2e7ff",
+                        "tertiary": "#515659",
+                        "on-tertiary-container": "#edf1f5",
+                        "on-surface-variant": "#434655",
+                        "on-secondary-container": "#54647a",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c3c7cb",
+                        "secondary": "#505f76",
+                        "surface-container-low": "#f2f3ff",
+                        "background": "#faf8ff",
+                        "primary-fixed": "#dbe1ff",
+                        "outline": "#737686",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-tertiary-fixed-variant": "#43474b",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-dim": "#d2d9f4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#2563eb",
+                        "on-primary": "#ffffff",
+                        "primary": "#004ac6",
+                        "tertiary-fixed": "#dfe3e7",
+                        "surface-variant": "#dae2fd",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary-fixed": "#171c1f",
+                        "on-background": "#131b2e",
+                        "surface-container": "#eaedff",
+                        "surface-bright": "#faf8ff",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#696e71",
+                        "inverse-on-surface": "#eef0ff",
+                        "surface": "#faf8ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xxl": "48px",
+                        "unit": "8px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "container-padding": "32px",
+                        "gutter": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Geist"],
+                        "label-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "body-sm": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "body-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "headline-lg-mobile": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- Navigation Drawer (Desktop) -->
+<aside class="hidden lg:flex flex-col h-screen w-72 fixed left-0 top-0 bg-surface-container-lowest border-r border-outline-variant z-50 p-md gap-sm">
+<div class="mb-xxl px-sm">
+<span class="text-headline-md font-headline-md font-black text-primary">Asistente Comunal</span>
+<p class="text-label-md font-label-md text-on-surface-variant tracking-wider mt-xs uppercase">MÉRIDA, VENEZUELA</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-body-md font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="text-body-md font-body-md">Padrón de Voceros</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="text-body-md font-body-md">Consultar Archivos</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-body-md font-body-md">Bitácora Comunal</span>
+</a>
+<a class="flex items-center gap-md p-md bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-200 shadow-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">how_to_vote</span>
+<span class="text-body-md font-body-md">Consultas Populares</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-body-md font-body-md">Informes</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant">
+<div class="flex items-center gap-md px-sm py-md">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim flex items-center justify-center text-on-primary-fixed font-bold border border-outline-variant">
+                    AC
+                </div>
+<div>
+<p class="text-label-md font-label-md font-bold text-on-surface">Admin Comunal</p>
+<p class="text-[10px] text-on-surface-variant">Presidente Obrero</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-on-surface-variant cursor-pointer hover:text-primary transition-colors">settings</span>
+</div>
+</div>
+</aside>
+<!-- Top App Bar (Mobile) -->
+<header class="lg:hidden fixed top-0 w-full h-16 glass-header border-b border-outline-variant flex justify-between items-center px-md z-40">
+<span class="text-headline-md font-headline-md font-bold text-on-surface">Consultas</span>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim border border-outline-variant overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVIN4lLZR5v4eBDxM-kys1d6Xh5zGK0ReMEBHZ0o7j6JSDum2cjqWosgcHalDJa_xpYGg_Mr8_Em2dxkHv_gMImM8JuNwgiB-qK7Ompzr9_K7Odbr0wZqGvAW-mdq5_JpGiiXaCctTYBRbrfViBW1FLSCNDE5mfXw49bU2gGBNXCyBIba7j3vkFuHIkhzSZkqH1i2af8jJlVweWHO6KFYgP2snzMbtSmY9ldUEX-HS-oBXeuTh8k4k8Do46bNxEvgzhGc_rOOvPA"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="lg:ml-72 pt-20 lg:pt-0 p-md lg:p-xxl min-h-screen">
+<!-- Header Section -->
+<div class="mb-xl flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h1 class="text-headline-lg-mobile lg:text-headline-lg font-headline-lg text-on-surface mb-xs">Consultas Populares</h1>
+<p class="text-body-md font-body-md text-on-surface-variant">Gestión de la democracia participativa y protagónica en el sector.</p>
+</div>
+<button class="flex items-center gap-sm bg-primary text-on-primary px-lg py-md rounded-xl font-bold hover:opacity-90 shadow-md transition-all active:scale-95">
+<span class="material-symbols-outlined">add</span>
+<span>Nueva Consulta</span>
+</button>
+</div>
+<div class="bento-grid">
+<!-- Active Consultations Main Card -->
+<section class="col-span-12 xl:col-span-8 space-y-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg tonal-surface ghost-border">
+<div class="flex items-center justify-between mb-lg">
+<div class="flex items-center gap-sm">
+<span class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+<h2 class="text-headline-md font-headline-md text-on-surface">En Curso</h2>
+</div>
+<span class="text-label-md font-label-md bg-emerald-100 text-emerald-800 px-md py-xs rounded-full">2 ACTIVAS</span>
+</div>
+<!-- Consultation Item 1 -->
+<div class="group bg-surface-container-low rounded-xl p-lg border border-outline-variant hover:border-primary/50 transition-all duration-300 mb-md tonal-surface">
+<div class="flex flex-col md:flex-row justify-between gap-md mb-md">
+<div>
+<h3 class="text-body-lg font-bold text-on-surface mb-xs group-hover:text-primary transition-colors">Proyecto de Electrificación Sector C</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-xl">Votación para determinar el orden de prioridad en la sustitución de transformadores y luminarias LED en las veredas 4 a 12.</p>
+</div>
+<div class="text-right">
+<p class="text-label-md font-label-md text-on-surface-variant uppercase tracking-widest">Cierre en</p>
+<p class="text-body-lg font-bold text-emerald-600">48 Horas</p>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between text-label-md font-label-md mb-1">
+<span class="text-on-surface-variant">Participación actual: 72%</span>
+<span class="text-primary font-bold">156 / 216 Votos</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 72%"></div>
+</div>
+</div>
+<div class="mt-lg flex gap-md">
+<button class="flex-1 py-md rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors font-bold text-body-sm">Ver Detalles</button>
+<button class="flex-1 py-md rounded-lg bg-primary text-on-primary hover:brightness-110 transition-all font-bold text-body-sm shadow-sm">Cargar Votos Manuales</button>
+</div>
+</div>
+<!-- Consultation Item 2 -->
+<div class="group bg-surface-container-low rounded-xl p-lg border border-outline-variant hover:border-primary/50 transition-all duration-300 tonal-surface">
+<div class="flex flex-col md:flex-row justify-between gap-md mb-md">
+<div>
+<h3 class="text-body-lg font-bold text-on-surface mb-xs group-hover:text-primary transition-colors">Uso de Espacio Común: Cancha Central</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-xl">Consulta para aprobar el reglamento de uso y horarios del complejo deportivo multiuso.</p>
+</div>
+<div class="text-right">
+<p class="text-label-md font-label-md text-on-surface-variant uppercase tracking-widest">Cierre en</p>
+<p class="text-body-lg font-bold text-on-surface">6 Días</p>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between text-label-md font-label-md mb-1">
+<span class="text-on-surface-variant">Participación actual: 34%</span>
+<span class="text-primary font-bold">74 / 216 Votos</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 34%"></div>
+</div>
+</div>
+<div class="mt-lg flex gap-md">
+<button class="flex-1 py-md rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors font-bold text-body-sm">Ver Detalles</button>
+<button class="flex-1 py-md rounded-lg bg-primary text-on-primary hover:brightness-110 transition-all font-bold text-body-sm shadow-sm">Cargar Votos Manuales</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats & Quick Actions -->
+<aside class="col-span-12 xl:col-span-4 space-y-lg">
+<!-- Participation Chart Placeholder Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg overflow-hidden relative min-h-[240px] tonal-surface ghost-border">
+<h3 class="text-body-md font-bold text-on-surface mb-md">Participación Histórica</h3>
+<div class="h-32 flex items-end justify-around gap-xs">
+<div class="w-8 bg-primary/20 rounded-t-sm h-[40%]"></div>
+<div class="w-8 bg-primary/30 rounded-t-sm h-[60%]"></div>
+<div class="w-8 bg-primary/50 rounded-t-sm h-[85%]"></div>
+<div class="w-8 bg-primary/40 rounded-t-sm h-[70%]"></div>
+<div class="w-8 bg-primary rounded-t-sm h-[95%]"></div>
+</div>
+<div class="flex justify-between mt-md text-label-md text-on-surface-variant font-label-md">
+<span>ENE</span>
+<span>FEB</span>
+<span>MAR</span>
+<span>ABR</span>
+<span>MAY</span>
+</div>
+</div>
+<!-- Recent Results List -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg tonal-surface ghost-border">
+<h3 class="text-body-md font-bold text-on-surface mb-lg">Resultados Recientes</h3>
+<div class="space-y-lg">
+<div class="flex items-start gap-md">
+<div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-emerald-600" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<div class="border-b border-outline-variant pb-md flex-1">
+<p class="text-body-sm font-bold text-on-surface">Reparación de Bomba de Agua</p>
+<p class="text-label-md font-label-md text-emerald-600 mt-xs font-bold">APROBADO (91%)</p>
+<p class="text-[10px] text-on-surface-variant uppercase mt-1">Finalizado 12/05/24</p>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<div class="w-10 h-10 rounded-lg bg-error-container/20 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">cancel</span>
+</div>
+<div class="border-b border-outline-variant pb-md flex-1">
+<p class="text-body-sm font-bold text-on-surface">Cambio de Horario Recolección</p>
+<p class="text-label-md font-label-md text-error mt-xs font-bold">RECHAZADO (42%)</p>
+<p class="text-[10px] text-on-surface-variant uppercase mt-1">Finalizado 05/05/24</p>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-emerald-600" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<div class="flex-1">
+<p class="text-body-sm font-bold text-on-surface">Poda de Árboles - Calle Bolívar</p>
+<p class="text-label-md font-label-md text-emerald-600 mt-xs font-bold">APROBADO (78%)</p>
+<p class="text-[10px] text-on-surface-variant uppercase mt-1">Finalizado 28/04/24</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg text-primary text-label-md font-bold py-md border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors">
+                        Ver todo el archivo
+                    </button>
+</div>
+</aside>
+<!-- Community Impact / Map Section -->
+<section class="col-span-12">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden tonal-surface ghost-border">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center">
+<div>
+<h3 class="text-body-lg font-bold text-on-surface">Alcance de Consultas por Calle</h3>
+<p class="text-body-sm text-on-surface-variant">Mapa de calor de participación ciudadana en el último trimestre.</p>
+</div>
+<div class="flex gap-sm">
+<span class="flex items-center gap-xs text-label-md font-label-md text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-error"></span> Bajo
+                            </span>
+<span class="flex items-center gap-xs text-label-md font-label-md text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Alto
+                            </span>
+</div>
+</div>
+<div class="h-64 md:h-96 relative w-full bg-surface-container-low">
+<div class="absolute inset-0 bg-cover bg-center opacity-20 grayscale" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDPYjjCxccvk6hna5ycK2l_JKicQsMGbNIN3q8dA3uTcGFP4jJQG6TgdtKvunZHIU0XyyNEhP_ukf7OMEwEnbc6ASWO4kcy2vqh_KkR0PAtABdGAsT5jhGCztoaK_z3LRH2xFHbLB7wZUGciYC_IGeFi4WCoYV5EYCboHRoUj-sUsItUFR37VsAeDxbxVThAmoI-TCN_egG60z4pORD8xcb2i4LxitZg8NLUfydzY1p2YytlEZaVloIeMCCNnJsdsA3hcJuTAJLJg')"></div>
+<!-- Pulse interactions -->
+<div class="absolute top-1/4 left-1/3 animate-pulse">
+<div class="w-4 h-4 bg-emerald-500 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.6)]"></div>
+</div>
+<div class="absolute top-1/2 left-2/3 animate-pulse" style="animation-delay: 1s">
+<div class="w-6 h-6 bg-emerald-500/80 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.4)]"></div>
+</div>
+<div class="absolute bottom-1/4 left-1/2 animate-pulse" style="animation-delay: 2s">
+<div class="w-3 h-3 bg-error rounded-full shadow-[0_0_15px_rgba(186,26,26,0.6)]"></div>
+</div>
+<!-- Data Overlay -->
+<div class="absolute bottom-lg left-lg bg-white/90 border border-outline-variant p-md rounded-lg backdrop-blur-md shadow-lg">
+<p class="text-label-md font-label-md text-on-surface-variant uppercase mb-xs font-bold">Sector con Mayor Interés</p>
+<p class="text-body-md font-bold text-on-surface">Avenida Principal Sur</p>
+<p class="text-label-md font-bold text-emerald-600 mt-1">94% Participación</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center py-sm px-md pb-safe bg-surface-container-lowest border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-md font-label-md mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-label-md font-label-md mt-1">Censo</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary text-on-primary rounded-full px-6 py-2 active:scale-95 transition-transform duration-150 shadow-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">poll</span>
+<span class="text-label-md font-bold mt-0.5">Consultas</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="text-label-md font-label-md mt-1">Archivos</span>
+</a>
+</nav>
+<!-- Contextual Floating Action Button (Mobile) -->
+<button class="lg:hidden fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center z-40 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.group').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 10px 25px -5px rgba(0, 74, 198, 0.1), 0 8px 10px -6px rgba(0, 74, 198, 0.1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.6s ease-in-out';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body></html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Padrón de Voceros - Asistente Comunal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#00174b",
+                        "outline-variant": "#c3c6d7",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#b4c5ff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-tint": "#0053db",
+                        "secondary-container": "#d0e1fb",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "inverse-surface": "#283044",
+                        "on-surface": "#131b2e",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#dae2fd",
+                        "surface-container-high": "#e2e7ff",
+                        "tertiary": "#515659",
+                        "on-tertiary-container": "#edf1f5",
+                        "on-surface-variant": "#434655",
+                        "on-secondary-container": "#54647a",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c3c7cb",
+                        "secondary": "#505f76",
+                        "surface-container-low": "#f2f3ff",
+                        "background": "#faf8ff",
+                        "primary-fixed": "#dbe1ff",
+                        "outline": "#737686",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-tertiary-fixed-variant": "#43474b",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-dim": "#d2d9f4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#2563eb",
+                        "on-primary": "#ffffff",
+                        "primary": "#004ac6",
+                        "tertiary-fixed": "#dfe3e7",
+                        "surface-variant": "#dae2fd",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary-fixed": "#171c1f",
+                        "on-background": "#131b2e",
+                        "surface-container": "#eaedff",
+                        "surface-bright": "#faf8ff",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#696e71",
+                        "inverse-on-surface": "#eef0ff",
+                        "surface": "#faf8ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xxl": "48px",
+                        "unit": "8px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "container-padding": "32px",
+                        "gutter": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Geist"],
+                        "label-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "body-sm": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "body-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "headline-lg-mobile": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Geist', sans-serif; background-color: #faf8ff; color: #131b2e; margin: 0; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .ghost-border { border: 1px solid #e2e7ff; }
+        .tonal-surface { background-color: #ffffff; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03); }
+        .active-glow:hover { box-shadow: 0px 4px 20px rgba(0, 74, 198, 0.05); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f2f3ff; }
+        ::-webkit-scrollbar-thumb { background: #c3c6d7; border-radius: 10px; }
+        body { min-height: max(884px, 100dvh); }
+    </style>
+</head>
+<body class="flex min-h-screen overflow-hidden">
+<!-- Navigation Drawer (Desktop) -->
+<aside class="hidden lg:flex flex-col h-full w-72 bg-surface-container-lowest border-r border-outline-variant p-md gap-sm">
+<div class="flex items-center gap-md mb-lg">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<h2 class="text-label-md font-label-md text-on-surface">Admin Comunal</h2>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Mérida, Venezuela</p>
+</div>
+</div>
+<nav class="flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-body-md font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary font-bold rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="text-body-md font-body-md">Padrón de Voceros</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="text-body-md font-body-md">Consultar Archivos</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-body-md font-body-md">Bitácora Comunal</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">how_to_vote</span>
+<span class="text-body-md font-body-md">Consultas Populares</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-body-md font-body-md">Informes</span>
+</a>
+</nav>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 flex flex-col h-screen overflow-y-auto bg-background relative pb-20 lg:pb-0">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-30 flex justify-between items-center w-full px-lg h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<h1 class="text-headline-md font-bold text-on-surface">Padrón de Voceros</h1>
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a community manager." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBPfdJs7x2N50ptwWtfLe-yMXBOxphb65RIE0KVP7bhNYYVQq2PEWrRKSRX5BdE8n5ZqDx6oe2VZ3EH2qGe1Me0-4ACw21vgyrm5dZIBLuDl300tGCLSIuGC8GopRiZZhrL9AvGV8btC_hCgpYXRIiF3k3Sl8J4wygwZzfTS9sasg0pe0skjblywVKOPPbDsEt5vr65dqXh1Bf8wOaDOCgAZZNTIzYMLDNdk5cAmrSMI9E42Wd9z1io5uFunW_WYKtgxkptzcYCA"/>
+</div>
+</div>
+</header>
+<!-- Search & Filter Bar -->
+<section class="px-lg pt-lg pb-md flex flex-col gap-md lg:flex-row lg:items-center">
+<div class="relative flex-1 group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full h-12 bg-surface-container-lowest ghost-border rounded-xl pl-12 pr-4 text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-outline" placeholder="Buscar vocero por nombre, cédula o unidad..." type="text"/>
+</div>
+<div class="flex items-center gap-sm overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+<button class="whitespace-nowrap px-md py-2 rounded-full bg-primary text-on-primary text-label-md font-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                    Todos
+                </button>
+<button class="whitespace-nowrap px-md py-2 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant text-label-md font-label-md transition-colors">
+                    Legislativo
+                </button>
+<button class="whitespace-nowrap px-md py-2 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant text-label-md font-label-md transition-colors">
+                    Ejecutivo
+                </button>
+<button class="whitespace-nowrap px-md py-2 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant text-label-md font-label-md transition-colors">
+                    Contraloría
+                </button>
+<button class="whitespace-nowrap px-md py-2 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant text-label-md font-label-md transition-colors">
+                    Planificación
+                </button>
+</div>
+</section>
+<!-- Directory List -->
+<section class="px-lg flex flex-col gap-sm pb-xl">
+<!-- Row 1 -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between p-lg tonal-surface ghost-border rounded-xl hover:bg-surface-container-low transition-all active-glow group">
+<div class="flex items-center gap-lg">
+<div class="relative">
+<div class="w-14 h-14 rounded-full border-2 border-primary p-0.5">
+<div class="w-full h-full rounded-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of an elderly Venezuelan woman leader." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIaa_3FdYWgVHPPxelkxJWe4xq4QJuBN3L5drvLkdFhwqzAdLJOW8TfXyrQxUivyiNp_omWyeOGNWgTF2PTPhsrxm7s6suVT-6PAoOCe1GTGE7OGDCSM3LcRbanB967n_U2EPv5DWSJBZ46c7UE00Q1DGjE1oQKuJKpqOXACF3iVMsIGIi9iGEbZsKK71Ot0ScsAlNTkFPflQ_klttwbcYOx42jMi9kvioBUdF7WvDq3ve_LicbOcQJlKXlo6WQAe99E1LTHN2aQ"/>
+</div>
+</div>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full" title="Activo"></div>
+</div>
+<div>
+<h3 class="text-body-lg font-bold text-on-surface">Beatriz Hernández</h3>
+<p class="text-body-sm text-on-surface-variant">C.I. 12.345.678 • Unidad Ejecutiva</p>
+</div>
+</div>
+<div class="mt-md lg:mt-0 flex items-center justify-between lg:justify-end gap-xl lg:gap-xxl">
+<div class="hidden md:block">
+<p class="text-label-md text-outline uppercase tracking-widest mb-1">Comité</p>
+<p class="text-body-md text-on-surface">Finanzas y Economía</p>
+</div>
+<div class="flex items-center gap-sm">
+<a class="w-11 h-11 flex items-center justify-center rounded-xl bg-primary-container/10 border border-primary-container/20 text-primary transition-all hover:bg-primary-container/20" href="#">
+<span class="material-symbols-outlined">chat</span>
+</a>
+<a class="w-11 h-11 flex items-center justify-center rounded-xl ghost-border text-on-surface-variant transition-all hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">call</span>
+</a>
+<button class="w-11 h-11 flex items-center justify-center rounded-xl ghost-border text-on-surface-variant transition-all hover:bg-surface-container-high">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between p-lg tonal-surface ghost-border rounded-xl hover:bg-surface-container-low transition-all active-glow">
+<div class="flex items-center gap-lg">
+<div class="relative">
+<div class="w-14 h-14 rounded-full border-2 border-outline-variant p-0.5">
+<div class="w-full h-full rounded-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a young man with glasses." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0Qtd13HL-x3_LOaxrlUdtSAnDI3xNrucJI09oiLXCQISulWaUHYGge1moaA26DABeIbFEsjvDAU0BgZvZzyLyHnxFwUAJ7T8n0mxXLIJ4Tj3xPC2r9hDyWhXDhDpFuC9LTNbhCzajA6Ow3kRWxa09Yoz5JyniZa6YOgHLYEnUkgHpIf4Our-jQ6Ez5tAQ9DnJVXcMXhxYuRHe5zKcIc985uaRfEBQ5EPPgmaUjvOWRtQAUVb1m1Xshm1ai-ZFSY_Xz35ivYok4Q"/>
+</div>
+</div>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full"></div>
+</div>
+<div>
+<h3 class="text-body-lg font-bold text-on-surface">Ricardo Peña</h3>
+<p class="text-body-sm text-on-surface-variant">C.I. 20.987.654 • Unidad Legislativa</p>
+</div>
+</div>
+<div class="mt-md lg:mt-0 flex items-center justify-between lg:justify-end gap-xl lg:gap-xxl">
+<div class="hidden md:block">
+<p class="text-label-md text-outline uppercase tracking-widest mb-1">Comité</p>
+<p class="text-body-md text-on-surface">Salud y Deporte</p>
+</div>
+<div class="flex items-center gap-sm">
+<a class="w-11 h-11 flex items-center justify-center rounded-xl bg-primary-container/10 border border-primary-container/20 text-primary transition-all hover:bg-primary-container/20" href="#">
+<span class="material-symbols-outlined">chat</span>
+</a>
+<a class="w-11 h-11 flex items-center justify-center rounded-xl ghost-border text-on-surface-variant transition-all hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">call</span>
+</a>
+<button class="w-11 h-11 flex items-center justify-center rounded-xl ghost-border text-on-surface-variant transition-all hover:bg-surface-container-high">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between p-lg tonal-surface ghost-border rounded-xl hover:bg-surface-container-low transition-all active-glow">
+<div class="flex items-center gap-lg">
+<div class="relative">
+<div class="w-14 h-14 rounded-full border-2 border-outline-variant p-0.5">
+<div class="w-full h-full rounded-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Middle-aged woman leader." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPF02tzS6fG4GlWBfUpqMIqs9v6mqJEziSKK0PyIxTdx19G46DWoqqRuqqYOV2JE-k8FRJ8AIOr1iwCbmLbfpl7hiM7El-9pMIoIJ_f0Wgjwgq43LfIltwob51Jkvuklt_eCK6i_NQESDtL4jud4YpHXJLWyV6shn4Lz19-656B3ZUPmptpmsaGCRUVwe7bQI5LBO4dxRgBnw5VDdNiy1OWLcWem0zcefjppjIta1atGSEh-JmW5Q-g-uzSkqzkCDdPu-SZwJhng"/>
+</div>
+</div>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-outline-variant border-2 border-white rounded-full"></div>
+</div>
+<div>
+<h3 class="text-body-lg font-bold text-on-surface">María Josefina</h3>
+<p class="text-body-sm text-on-surface-variant">C.I. 15.123.456 • Contraloría Social</p>
+</div>
+</div>
+<div class="mt-md lg:mt-0 flex items-center justify-between lg:justify-end gap-xl lg:gap-xxl">
+<div class="hidden md:block">
+<p class="text-label-md text-outline uppercase tracking-widest mb-1">Comité</p>
+<p class="text-body-md text-on-surface">Servicios Públicos</p>
+</div>
+<div class="flex items-center gap-sm">
+<a class="w-11 h-11 flex items-center justify-center rounded-xl bg-primary-container/10 border border-primary-container/20 text-primary transition-all hover:bg-primary-container/20" href="#">
+<span class="material-symbols-outlined">chat</span>
+</a>
+<a class="w-11 h-11 flex items-center justify-center rounded-xl ghost-border text-on-surface-variant transition-all hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">call</span>
+</a>
+<button class="w-11 h-11 flex items-center justify-center rounded-xl ghost-border text-on-surface-variant transition-all hover:bg-surface-container-high">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between p-lg tonal-surface ghost-border rounded-xl hover:bg-surface-container-low transition-all active-glow">
+<div class="flex items-center gap-lg">
+<div class="relative">
+<div class="w-14 h-14 rounded-full border-2 border-outline-variant p-0.5">
+<div class="w-full h-full rounded-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a middle-aged male community leader." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgiKVT5OlL4iw8grNqu5MKa9im05JxuUZz8NzoCn_IGkMJV69DqGxGZY7fxmAq6Dsori7wBoc_hoDhWx9n9bKDBB2S4kVlV2y8AzsUhpkW66Trrk7U7oICVElehy97vQIHDXUYrENWmwwYnCnyUnBfarxYum-qU94rZTqqHQd-1PJ581rfGQeUSRxF3KUCBnbxkdhQImuyp3nYKz1YHmHfMDaXKjU_dILm8yxL3QbRmGydsQTe4zFKNQ-LVY6tJvc1Rx1JmqxOPQ"/>
+</div>
+</div>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full"></div>
+</div>
+<div>
+<h3 class="text-body-lg font-bold text-on-surface">Carlos Eduardo</h3>
+<p class="text-body-sm text-on-surface-variant">C.I. 18.555.222 • Unidad de Planificación</p>
+</div>
+</div>
+<div class="mt-md lg:mt-0 flex items-center justify-between lg:justify-end gap-xl lg:gap-xxl">
+<div class="hidden md:block">
+<p class="text-label-md text-outline uppercase tracking-widest mb-1">Comité</p>
+<p class="text-body-md text-on-surface">Vivienda y Hábitat</p>
+</div>
+<div class="flex items-center gap-sm">
+<a class="w-11 h-11 flex items-center justify-center rounded-xl bg-primary-container/10 border border-primary-container/20 text-primary transition-all hover:bg-primary-container/20" href="#">
+<span class="material-symbols-outlined">chat</span>
+</a>
+<a class="w-11 h-11 flex items-center justify-center rounded-xl ghost-border text-on-surface-variant transition-all hover:bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">call</span>
+</a>
+<button class="w-11 h-11 flex items-center justify-center rounded-xl ghost-border text-on-surface-variant transition-all hover:bg-surface-container-high">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Floating Action Button (FAB) Mobile -->
+<button class="fixed bottom-24 right-6 w-14 h-14 rounded-full bg-primary text-on-primary shadow-2xl flex items-center justify-center lg:hidden transition-transform active:scale-90 z-50">
+<span class="material-symbols-outlined">person_add</span>
+</button>
+</main>
+<!-- Bottom Navigation Bar (Mobile only) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center py-sm px-md pb-safe bg-surface-container-lowest border-t border-outline-variant z-50 rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-md font-label-md mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container/10 text-primary rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-label-md font-label-md mt-1">Voceros</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="text-label-md font-label-md mt-1">Archivos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-label-md font-label-md mt-1">Perfil</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for filter buttons
+        const filterBtns = document.querySelectorAll('button.whitespace-nowrap');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary');
+                    b.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+                });
+                btn.classList.add('bg-primary', 'text-on-primary');
+                btn.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+            });
+        });
+
+        // Search highlight effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+    </script>
+</body></html>

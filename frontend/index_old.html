@@ -1,0 +1,2968 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Comunal — CPPO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg:          #0d1117;
+            --bg-card:     #161b22;
+            --bg-card-2:   #1c2230;
+            --border:      #2a3342;
+            --border-glow: #2b4a7a;
+            --txt:         #e6edf3;
+            --txt-muted:   #8b949e;
+            --txt-faint:   #484f58;
+            --accent:      #2563eb;
+            --accent-glow: rgba(37,99,235,0.18);
+            --gold:        #d4a017;
+            --gold-glow:   rgba(212,160,23,0.15);
+            --green:       #22c55e;
+            --red:         #ef4444;
+            --purple:      #a855f7;
+            --teal:        #14b8a6;
+            --radius:      10px;
+            --sidebar-w:   240px;
+            --header-h:    58px;
+            --font-mono:   'Space Mono', monospace;
+            --font:        'DM Sans', sans-serif;
+            --shadow:      0 4px 24px rgba(0,0,0,0.4);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--txt);
+            font-size: 14px;
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* ── Layout ─────────────────────────────────── */
+        .shell {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ── Sidebar ─────────────────────────────────── */
+        .sidebar {
+            width: var(--sidebar-w);
+            flex-shrink: 0;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .brand {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .brand-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--txt);
+            line-height: 1.3;
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            color: var(--txt-muted);
+            margin-top: 2px;
+        }
+
+        .nav {
+            padding: 12px 8px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--txt-faint);
+            padding: 10px 10px 4px;
+            margin-top: 4px;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--txt-muted);
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            transition: all 0.15s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--txt);
+        }
+
+        .nav-btn.active {
+            background: var(--accent-glow);
+            color: #60a5fa;
+            border: 1px solid var(--border-glow);
+        }
+
+        .nav-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 20px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .nav-badge.warning { background: var(--gold); color: #000; }
+
+        .sidebar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--txt-muted);
+        }
+
+        .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ── Main area ──────────────────────────────── */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            height: var(--header-h);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 22px;
+            background: var(--bg-card);
+            flex-shrink: 0;
+        }
+
+        .topbar-left h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--txt);
+        }
+
+        .topbar-left p {
+            font-size: 11px;
+            color: var(--txt-muted);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: var(--bg-card-2);
+            color: var(--txt-muted);
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn:hover { border-color: var(--border-glow); color: var(--txt); }
+        .btn svg { width: 13px; height: 13px; }
+
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            color: #fff;
+        }
+
+        .btn-block { width: 100%; justify-content: center; }
+
+        /* ── Content area ───────────────────────────── */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* ── DASHBOARD ──────────────────────────────── */
+        .dashboard {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* KPI cards row */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .kpi-card:hover { border-color: var(--border-glow); }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+        }
+
+        .kpi-card.blue::before  { background: var(--accent); }
+        .kpi-card.green::before { background: var(--green); }
+        .kpi-card.gold::before  { background: var(--gold); }
+        .kpi-card.purple::before { background: var(--purple); }
+
+        .kpi-icon {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .kpi-card.blue   .kpi-icon { background: rgba(37,99,235,0.15); color: #60a5fa; }
+        .kpi-card.green  .kpi-icon { background: rgba(34,197,94,0.12); color: var(--green); }
+        .kpi-card.gold   .kpi-icon { background: var(--gold-glow); color: var(--gold); }
+        .kpi-card.purple .kpi-icon { background: rgba(168,85,247,0.12); color: var(--purple); }
+
+        .kpi-icon svg { width: 18px; height: 18px; }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--txt);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--txt-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-delta {
+            position: absolute;
+            top: 14px; right: 14px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .kpi-delta.up   { color: var(--green); }
+        .kpi-delta.down { color: var(--red); }
+
+        /* Middle row: chart + quick-list */
+        .dash-mid {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 14px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--txt);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title svg { width: 14px; height: 14px; color: var(--txt-muted); }
+
+        .card-body { padding: 16px 18px; }
+
+        .chart-wrap {
+            padding: 16px 18px;
+            height: 240px;
+            position: relative;
+        }
+
+        /* Tasks mini-list */
+        .mini-task {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mini-task:last-child { border-bottom: none; }
+
+        .task-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .task-dot.urgent { background: var(--red); }
+        .task-dot.soon   { background: var(--gold); }
+
+        .task-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--txt);
+            line-height: 1.3;
+        }
+
+        .task-when {
+            font-size: 11px;
+            color: var(--txt-muted);
+        }
+
+        /* Bottom row */
+        .dash-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* Last activity */
+        .activity-snippet {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .act-icon-wrap {
+            width: 40px; height: 40px;
+            border-radius: 9px;
+            background: rgba(37,99,235,0.12);
+            display: flex; align-items: center; justify-content: center;
+            color: #60a5fa;
+            flex-shrink: 0;
+        }
+
+        .act-icon-wrap svg { width: 18px; height: 18px; }
+
+        .act-meta { font-size: 11px; color: var(--txt-muted); margin-bottom: 4px; }
+        .act-desc { font-size: 13px; color: var(--txt); line-height: 1.5; }
+
+        /* ── PADRON ─────────────────────────────────── */
+        .padron-page {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .page-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--txt);
+        }
+
+        .page-header p {
+            font-size: 12px;
+            color: var(--txt-muted);
+            margin-top: 3px;
+        }
+
+        .header-actions { display: flex; gap: 8px; }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+        }
+
+        .search-input-wrap svg {
+            position: absolute;
+            left: 10px; top: 50%;
+            transform: translateY(-50%);
+            width: 14px; height: 14px;
+            color: var(--txt-muted);
+            pointer-events: none;
+        }
+
+        .input, select.input, textarea.input {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--txt);
+            font-family: var(--font);
+            font-size: 13px;
+            padding: 8px 12px;
+            outline: none;
+            width: 100%;
+            transition: border-color 0.15s;
+        }
+
+        .input:focus { border-color: var(--accent); }
+
+        .search-input-wrap .input { padding-left: 32px; }
+
+        select.input { cursor: pointer; }
+
+        /* Consejo cards grid */
+        .consejos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .consejo-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .consejo-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37,99,235,0.15);
+        }
+
+        .consejo-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: var(--accent);
+        }
+
+        .consejo-nombre {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--txt);
+            margin-bottom: 6px;
+        }
+
+        .consejo-parroquia {
+            font-size: 11px;
+            color: var(--txt-muted);
+            margin-bottom: 10px;
+        }
+
+        .consejo-stats {
+            display: flex;
+            gap: 12px;
+        }
+
+        .consejo-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .consejo-stat-val {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: #60a5fa;
+        }
+
+        .consejo-stat-lbl {
+            font-size: 10px;
+            color: var(--txt-muted);
+            text-transform: uppercase;
+        }
+
+        /* Vocero table */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 10px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--txt-muted);
+            text-align: left;
+            background: var(--bg-card-2);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.1s;
+        }
+
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+        td {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: var(--txt);
+            vertical-align: middle;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-ejecutiva    { background: rgba(37,99,235,0.15); color: #60a5fa; }
+        .badge-finanzas     { background: rgba(212,160,23,0.12); color: var(--gold); }
+        .badge-contraloria  { background: rgba(168,85,247,0.12); color: var(--purple); }
+        .badge-legislativa  { background: rgba(20,184,166,0.12); color: var(--teal); }
+        .badge-otro         { background: rgba(139,148,158,0.1); color: var(--txt-muted); }
+
+        .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .td-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .name-text {
+            font-weight: 500;
+            color: var(--txt);
+        }
+
+        .name-cedula {
+            font-size: 11px;
+            color: var(--txt-muted);
+        }
+
+        /* Report-by-unidad panel */
+        .unidad-report-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .unidad-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--txt-muted);
+            font-family: var(--font);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .unidad-btn:hover, .unidad-btn.active {
+            border-color: var(--accent);
+            color: #60a5fa;
+            background: var(--accent-glow);
+        }
+
+        /* ── TABS HEREDADOS (Search, Letters, Activities, Reports, Tasks) */
+        .legacy-tab {
+            padding: 22px;
+        }
+
+        .pane-header {
+            margin-bottom: 20px;
+        }
+
+        .pane-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--txt);
+            margin-bottom: 4px;
+        }
+
+        .pane-header p {
+            font-size: 12px;
+            color: var(--txt-muted);
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .layout-grid-reports {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 16px;
+        }
+
+        .card-form, .card-list, .card-report-generator, .card-report-status {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        /* Forms */
+        .form-group { margin-bottom: 14px; }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--txt-muted);
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: var(--bg-card-2);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--txt);
+            font-family: var(--font);
+            font-size: 13px;
+            padding: 8px 12px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .form-group textarea { resize: vertical; }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row .form-group { flex: 1; }
+
+        /* Chat */
+        .chat-display {
+            background: var(--bg-card-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            height: 340px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .message { display: flex; gap: 10px; }
+
+        .message-avatar {
+            width: 34px; height: 34px;
+            border-radius: 8px;
+            background: var(--accent);
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-message .message-avatar { background: var(--bg-card); border: 1px solid var(--border); color: var(--txt-muted); }
+
+        .message-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0 10px 10px 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            max-width: 85%;
+        }
+
+        .user-message .message-content {
+            background: var(--accent-glow);
+            border-color: var(--border-glow);
+            border-radius: 10px 0 10px 10px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-form input {
+            flex: 1;
+            background: var(--bg-card-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--txt);
+            font-family: var(--font);
+            font-size: 13px;
+            padding: 9px 14px;
+            outline: none;
+        }
+
+        .search-form input:focus { border-color: var(--accent); }
+
+        /* List items */
+        .list-container {
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 13px;
+        }
+
+        .list-item:last-child { border-bottom: none; }
+
+        .list-item .item-title {
+            font-weight: 500;
+            color: var(--txt);
+            margin-bottom: 2px;
+        }
+
+        .list-item .item-meta {
+            font-size: 11px;
+            color: var(--txt-muted);
+        }
+
+        /* Report buttons */
+        .report-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-report {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card-2);
+            color: var(--txt);
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            width: 100%;
+            text-align: left;
+        }
+
+        .btn-report:hover {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+            color: #60a5fa;
+        }
+
+        .btn-report svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--txt-muted);
+            font-size: 13px;
+        }
+
+        .empty-state svg {
+            width: 36px; height: 36px;
+            margin-bottom: 10px;
+            opacity: 0.3;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(13,17,23,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            display: none;
+        }
+
+        .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-msg { font-size: 13px; color: var(--txt-muted); }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            display: flex; flex-direction: column; gap: 8px;
+            z-index: 1000;
+        }
+
+        .toast {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            animation: toastIn 0.25s ease;
+        }
+
+        .toast.success { background: #14532d; border: 1px solid #166534; color: #86efac; }
+        .toast.error   { background: #450a0a; border: 1px solid #991b1b; color: #fca5a5; }
+        .toast.info    { background: #1e3a5f; border: 1px solid #1d4ed8; color: #93c5fd; }
+
+        @keyframes toastIn {
+            from { opacity:0; transform: translateX(30px); }
+            to   { opacity:1; transform: translateX(0); }
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-backdrop.open { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 540px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .modal-header h4 { font-size: 15px; font-weight: 700; }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--txt-muted);
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        .modal-close:hover { color: var(--txt); }
+
+    </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-msg" id="loading-msg">Procesando...</div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toasts"></div>
+
+<!-- Modal: Agregar Vocero -->
+<div class="modal-backdrop" id="modal-vocero">
+    <div class="modal">
+        <div class="modal-header">
+            <h4>Registrar Nuevo Vocero</h4>
+            <button class="modal-close" onclick="closeModal('modal-vocero')">
+                <i data-lucide="x" style="width:16px;height:16px"></i>
+            </button>
+        </div>
+        <form id="form-vocero">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input class="input" id="v-nombre" placeholder="Ej. María López" required>
+                </div>
+                <div class="form-group">
+                    <label>Cédula de Identidad</label>
+                    <input class="input" id="v-cedula" placeholder="Ej. V-12345678" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Cargo</label>
+                    <input class="input" id="v-cargo" placeholder="Ej. Vocero/a Ejecutivo/a Principal" required>
+                </div>
+                <div class="form-group">
+                    <label>Unidad</label>
+                    <select class="input" id="v-unidad" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Ejecutiva">Ejecutiva</option>
+                        <option value="Administración y Finanzas">Administración y Finanzas</option>
+                        <option value="Contraloría Social">Contraloría Social</option>
+                        <option value="Legislativa">Legislativa</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Consejo Comunal</label>
+                    <select class="input" id="v-consejo" required>
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input class="input" id="v-telefono" placeholder="0414-0000000">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:6px">
+                <i data-lucide="user-plus"></i>
+                <span>Guardar Vocero</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Agregar Consejo -->
+<div class="modal-backdrop" id="modal-consejo">
+    <div class="modal">
+        <div class="modal-header">
+            <h4>Registrar Consejo Comunal</h4>
+            <button class="modal-close" onclick="closeModal('modal-consejo')">
+                <i data-lucide="x" style="width:16px;height:16px"></i>
+            </button>
+        </div>
+        <form id="form-consejo">
+            <div class="form-group">
+                <label>Nombre del Consejo Comunal</label>
+                <input class="input" id="c-nombre" placeholder="Ej. Consejo Comunal La Esperanza" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Parroquia</label>
+                    <input class="input" id="c-parroquia" placeholder="Ej. Milla">
+                </div>
+                <div class="form-group">
+                    <label>Municipio</label>
+                    <input class="input" id="c-municipio" placeholder="Ej. Libertador">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>RIF</label>
+                    <input class="input" id="c-rif" placeholder="Ej. J-00000000-0">
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input class="input" id="c-telefono" placeholder="0274-0000000">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Dirección</label>
+                <input class="input" id="c-direccion" placeholder="Calle, sector, referencia...">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:6px">
+                <i data-lucide="plus"></i>
+                <span>Registrar Consejo</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Agregar Consulta -->
+<div class="modal-backdrop" id="modal-consulta">
+    <div class="modal">
+        <div class="modal-header">
+            <h4>Registrar Consulta Popular</h4>
+            <button class="modal-close" onclick="closeModal('modal-consulta')">
+                <i data-lucide="x" style="width:16px;height:16px"></i>
+            </button>
+        </div>
+        <form id="form-consulta">
+            <div class="form-group">
+                <label>Título / Tema</label>
+                <input class="input" id="cons-titulo" placeholder="Ej. Presupuesto Participativo 2026" required>
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea class="input" id="cons-desc" rows="2" placeholder="Detalles de la consulta..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Fecha de Inicio</label>
+                    <input type="date" class="input" id="cons-inicio" required>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Cierre</label>
+                    <input type="date" class="input" id="cons-cierre" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:6px">
+                <i data-lucide="plus"></i>
+                <span>Registrar Consulta</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<div class="shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-badge">
+                <i data-lucide="shield" style="width:11px;height:11px"></i>
+                CPPO
+            </div>
+            <div class="brand-name">Asistente Comunal</div>
+            <div class="brand-sub">Presidente Obrero · Mérida</div>
+        </div>
+
+        <nav class="nav">
+            <span class="nav-section-label">Principal</span>
+            <button class="nav-btn active" data-tab="dashboard">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-btn" data-tab="padron">
+                <i data-lucide="users"></i>
+                <span>Padrón de Voceros</span>
+            </button>
+
+            <span class="nav-section-label">Gestión</span>
+            <button class="nav-btn" data-tab="search">
+                <i data-lucide="search"></i>
+                <span>Consultar Archivos</span>
+            </button>
+            <button class="nav-btn" data-tab="letters">
+                <i data-lucide="file-text"></i>
+                <span>Generar Oficios</span>
+            </button>
+            <button class="nav-btn" data-tab="activities">
+                <i data-lucide="book-open"></i>
+                <span>Bitácora Comunal</span>
+            </button>
+            <button class="nav-btn" data-tab="consultas">
+                <i data-lucide="bar-chart-2"></i>
+                <span>Consultas Populares</span>
+                <span class="nav-badge">Nuevo</span>
+            </button>
+
+            <span class="nav-section-label">Inteligencia</span>
+            <button class="nav-btn" data-tab="agent">
+                <i data-lucide="bot"></i>
+                <span>Agente de Consultas</span>
+                <span class="nav-badge">Nuevo</span>
+            </button>
+            <button class="nav-btn" data-tab="universal">
+                <i data-lucide="search"></i>
+                <span>Búsqueda Universal</span>
+                <span class="nav-badge">Nuevo</span>
+            </button>
+            <button class="nav-btn" data-tab="actas">
+                <i data-lucide="file-text"></i>
+                <span>Acta de Elección</span>
+                <span class="nav-badge">Nuevo</span>
+            </button>
+
+            <span class="nav-section-label">Reportes</span>
+            <button class="nav-btn" data-tab="reports">
+                <i data-lucide="trending-up"></i>
+                <span>Informes de Gestión</span>
+            </button>
+            <button class="nav-btn" data-tab="tasks">
+                <i data-lucide="check-square"></i>
+                <span>Tareas y Alertas</span>
+                <span class="nav-badge warning" id="badge-tasks">0</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="status-pill">
+                <div class="dot"></div>
+                <span>Sistema en línea</span>
+            </div>
+            <div style="font-size:10px; color:var(--txt-faint); margin-top:4px; font-family:var(--font-mono)">
+                v2.0 · CPPO-2026
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2 id="topbar-title">Dashboard General</h2>
+                <p id="topbar-sub">Vista consolidada de la gestión comunal</p>
+            </div>
+            <div class="topbar-right">
+                <button class="btn" id="btn-reindex">
+                    <i data-lucide="refresh-cw"></i>
+                    <span>Indexar Docs</span>
+                </button>
+                <button class="btn btn-primary" id="btn-topbar-action" style="display:none">
+                    <i data-lucide="plus"></i>
+                    <span id="btn-topbar-label">Acción</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content">
+
+            <!-- ══ DASHBOARD ══════════════════════════════ -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <div class="dashboard">
+
+                    <!-- KPI Row -->
+                    <div class="kpi-row">
+                        <div class="kpi-card blue">
+                            <div class="kpi-icon"><i data-lucide="calendar-check"></i></div>
+                            <div class="kpi-value" id="kpi-acts">—</div>
+                            <div class="kpi-label">Actividades este mes</div>
+                            <div class="kpi-delta up" id="kpi-acts-delta"></div>
+                        </div>
+                        <div class="kpi-card green">
+                            <div class="kpi-icon"><i data-lucide="users"></i></div>
+                            <div class="kpi-value" id="kpi-part">—</div>
+                            <div class="kpi-label">Participantes acumulados</div>
+                        </div>
+                        <div class="kpi-card gold">
+                            <div class="kpi-icon"><i data-lucide="mail"></i></div>
+                            <div class="kpi-value" id="kpi-cartas">—</div>
+                            <div class="kpi-label">Cartas emitidas 2026</div>
+                        </div>
+                        <div class="kpi-card purple">
+                            <div class="kpi-icon"><i data-lucide="alert-circle"></i></div>
+                            <div class="kpi-value" id="kpi-tareas">—</div>
+                            <div class="kpi-label">Tareas pendientes</div>
+                        </div>
+                        <div class="kpi-card red">
+                            <div class="kpi-icon"><i data-lucide="alert-triangle"></i></div>
+                            <div class="kpi-value" id="kpi-vencidas">—</div>
+                            <div class="kpi-label">Tareas vencidas</div>
+                        </div>
+                    </div>
+
+                    <!-- Mid row: Chart + Mini tasks -->
+                    <div class="dash-mid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="bar-chart"></i>
+                                    Actividades por Categoría — últimos 30 días
+                                </div>
+                                <button class="btn" onclick="switchTab('activities')" style="font-size:11px;padding:4px 10px">
+                                    Ver todo
+                                </button>
+                            </div>
+                            <div class="chart-wrap">
+                                <canvas id="chart-categorias"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="clock"></i>
+                                    Próximas Tareas
+                                </div>
+                                <button class="btn" onclick="switchTab('tasks')" style="font-size:11px;padding:4px 10px">
+                                    Ver agenda
+                                </button>
+                            </div>
+                            <div class="card-body" id="dash-mini-tasks">
+                                <div class="empty-state" style="padding:20px 0">
+                                    <p>Sin tareas pendientes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom row -->
+                    <div class="dash-bottom">
+                        <!-- Last activity -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="zap"></i>
+                                    Última Actividad Registrada
+                                </div>
+                            </div>
+                            <div class="card-body" id="dash-last-activity">
+                                <div class="empty-state" style="padding:20px 0">
+                                    <p>Sin actividades registradas</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Directorio rápido -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="search"></i>
+                                    Directorio Rápido de Voceros
+                                </div>
+                            </div>
+                            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+                                <div class="search-input-wrap">
+                                    <i data-lucide="search"></i>
+                                    <input class="input" id="dash-search-vocero"
+                                        placeholder="Nombre o cédula...">
+                                </div>
+                                <div id="dash-vocero-results" style="font-size:13px;color:var(--txt-muted)">
+                                    Escribe para buscar un vocero en cualquier consejo.
+                                </div>
+                                <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                                    <button class="unidad-btn" onclick="quickReportUnidad('Legislativa')">
+                                        <i data-lucide="gavel" style="display:inline;width:11px;height:11px;margin-right:4px"></i>
+                                        Voceros Legislativos
+                                    </button>
+                                    <button class="unidad-btn" onclick="quickReportUnidad('Ejecutiva')">
+                                        Voceros Ejecutivos
+                                    </button>
+                                    <button class="unidad-btn" onclick="quickReportUnidad('Contraloría Social')">
+                                        Contraloría
+                                    </button>
+                                    <button class="unidad-btn" onclick="switchTab('padron')">
+                                        Ver padrón completo →
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ══ PADRÓN DE VOCEROS ═══════════════════════ -->
+            <section id="tab-padron" class="tab-pane">
+                <div class="padron-page">
+
+                    <div class="page-header">
+                        <div>
+                            <h3>Padrón de Voceros y Consejos Comunales</h3>
+                            <p>Directorio completo de la estructura comunal del municipio</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn" onclick="openModal('modal-consejo')">
+                                <i data-lucide="building-2"></i>
+                                Nuevo Consejo
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('modal-vocero')">
+                                <i data-lucide="user-plus"></i>
+                                Agregar Vocero
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Consejos grid -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i data-lucide="building-2"></i>
+                                Consejos Comunales Registrados
+                            </div>
+                            <span id="consejos-count" style="font-size:12px;color:var(--txt-muted)">0 consejos</span>
+                        </div>
+                        <div style="padding:16px 18px">
+                            <div class="consejos-grid" id="consejos-grid">
+                                <div class="empty-state">
+                                    <i data-lucide="building-2"></i>
+                                    <p>No hay consejos comunales registrados aún.</p>
+                                    <button class="btn btn-primary" style="margin:12px auto 0; display:flex" onclick="openModal('modal-consejo')">
+                                        Registrar primero
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voceros table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i data-lucide="users"></i>
+                                Voceros Registrados
+                            </div>
+                            <span id="voceros-count" style="font-size:12px;color:var(--txt-muted)">0 voceros</span>
+                        </div>
+
+                        <!-- Filter + unidad tabs -->
+                        <div class="unidad-report-bar">
+                            <button class="unidad-btn active" data-unidad="all">Todos</button>
+                            <button class="unidad-btn" data-unidad="Ejecutiva">Ejecutiva</button>
+                            <button class="unidad-btn" data-unidad="Administración y Finanzas">Finanzas</button>
+                            <button class="unidad-btn" data-unidad="Contraloría Social">Contraloría</button>
+                            <button class="unidad-btn" data-unidad="Legislativa">Legislativa</button>
+                            <button class="unidad-btn" data-unidad="Otro">Otro</button>
+                        </div>
+
+                        <div style="padding:12px 18px;display:flex;gap:10px;border-bottom:1px solid var(--border)">
+                            <div class="search-input-wrap" style="max-width:300px">
+                                <i data-lucide="search"></i>
+                                <input class="input" id="vocero-search" placeholder="Buscar por nombre o cédula...">
+                            </div>
+                            <select class="input" id="vocero-filter-consejo" style="max-width:220px">
+                                <option value="">Todos los consejos</option>
+                            </select>
+                            <button class="btn" id="btn-export-xlsx" style="margin-left:auto">
+                                <i data-lucide="download"></i>
+                                Exportar .xlsx
+                            </button>
+                        </div>
+
+                        <div class="table-wrap" style="border:none;border-radius:0">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Vocero/a</th>
+                                        <th>Cargo</th>
+                                        <th>Unidad</th>
+                                        <th>Consejo Comunal</th>
+                                        <th>Teléfono</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="voceros-tbody">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="empty-state">
+                                                <i data-lucide="users"></i>
+                                                <p>No hay voceros registrados.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ CONSULTAR ARCHIVOS (RAG) ═══════════════ -->
+            <section id="tab-search" class="tab-pane">
+                <div class="legacy-tab">
+                    <div class="pane-header">
+                        <h3>Consulta Inteligente de Archivos</h3>
+                        <p>Pregunta sobre actas, censos, proyectos y oficios históricos de la comuna.</p>
+                    </div>
+                    <div style="max-width:860px">
+                        <div class="chat-display" id="search-chat">
+                            <div class="message">
+                                <div class="message-avatar">CPPO</div>
+                                <div class="message-content">
+                                    <p>Saludos, vocero. ¿Qué información deseas consultar hoy de los archivos de la comuna? Por ejemplo: <em>"¿Cuáles son los acuerdos del proyecto de agua de abril?"</em></p>
+                                </div>
+                            </div>
+                        </div>
+                        <form id="form-search" class="search-form">
+                            <input type="text" id="input-query" placeholder="Escribe tu consulta..." required autocomplete="off">
+                            <button type="submit" class="btn btn-primary">
+                                <i data-lucide="send"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ GENERAR OFICIOS ════════════════════════ -->
+            <section id="tab-letters" class="tab-pane">
+                <div class="legacy-tab">
+                    <div class="pane-header">
+                        <h3>Generador Automático de Oficios</h3>
+                        <p>Redacta cartas oficiales con IA. Numeración automática continua: CPPO-0001.</p>
+                    </div>
+                    <div class="layout-grid">
+                        <div class="card-form">
+                            <form id="form-letter">
+                                <div class="form-group"><label>Tipo de Documento</label><select id="letter-type" required></select></div>
+                                <div class="form-group"><label>Destinatario</label><input type="text" id="letter-to" placeholder="Ej. Ing. Carlos Pérez" required></div>
+                                <div class="form-group"><label>Cargo del Destinatario</label><input type="text" id="letter-to-cargo" placeholder="Ej. Director de Aguas del Municipio" required></div>
+                                <div class="form-group"><label>Asunto</label><input type="text" id="letter-subject" placeholder="Asunto del oficio" required></div>
+                                <div class="form-group"><label>Instrucciones / Detalles</label><textarea id="letter-prompt" rows="5" placeholder="Indica qué debe solicitar o comunicar la carta. La IA la redactará formalmente." required></textarea></div>
+                                <div class="form-group" style="position:relative">
+                                    <label>Vocero que firma (opcional)</label>
+                                    <input type="text" id="letter-signer-search" placeholder="Escribe el nombre del vocero..." autocomplete="off">
+                                    <input type="hidden" id="letter-signer-id" value="">
+                                    <div id="letter-signer-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;max-height:200px;overflow-y:auto;z-index:100"></div>
+                                </div>
+                                <div id="letter-signer-info" style="display:none;background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:12px">
+                                    <strong>Firma:</strong> <span id="letter-signer-name"></span><br>
+                                    <span id="letter-signer-cargo" style="color:var(--text-secondary)"></span>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block"><i data-lucide="file-plus"></i><span>Generar Carta Oficial</span></button>
+                            </form>
+                        </div>
+                        <div class="card-list">
+                            <h4 style="font-size:13px;font-weight:600;margin-bottom:12px">Correspondencia Emitida</h4>
+                            <div style="margin-bottom:10px"><input type="text" id="letters-search" placeholder="Buscar oficio por número, destinatario o asunto..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg-card);color:var(--text)"></div>
+                            <div class="list-container" id="letters-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ BITÁCORA COMUNAL ═══════════════════════ -->
+            <section id="tab-activities" class="tab-pane">
+                <div class="legacy-tab">
+                    <div class="pane-header">
+                        <h3>Bitácora Comunal de Actividades</h3>
+                        <p>Registra asambleas, obras, talleres y jornadas comunales con imágenes.</p>
+                    </div>
+                    <div class="layout-grid">
+                        <div class="card-form">
+                            <form id="form-activity">
+                                <div class="form-row">
+                                    <div class="form-group col-6"><label>Fecha</label><input type="date" id="act-date" required></div>
+                                    <div class="form-group col-6"><label>Categoría</label><select id="act-category" required></select></div>
+                                </div>
+                                <div class="form-group"><label>Descripción</label><textarea id="act-desc" rows="4" placeholder="Qué se hizo, acuerdos logrados..." required></textarea></div>
+                                <div class="form-row">
+                                    <div class="form-group col-6"><label>Participantes</label><input type="number" id="act-participants" value="0" min="0"></div>
+                                    <div class="form-group col-6"><label>Fotos</label><input type="file" id="act-photos" accept="image/*" multiple></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block"><i data-lucide="save"></i><span>Registrar Actividad</span></button>
+                            </form>
+                        </div>
+                        <div class="card-list">
+                            <h4 style="font-size:13px;font-weight:600;margin-bottom:12px">Actividades Registradas</h4>
+                            <div class="list-container" id="activities-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ CONSULTAS POPULARES ════════════════════ -->
+            <section id="tab-consultas" class="tab-pane">
+                <div class="legacy-tab">
+                    <div class="pane-header">
+                        <h3>Consultas Populares y Análisis Comparativo</h3>
+                        <p>Registra resultados de consultas, votaciones y censos. Compara resultados entre períodos.</p>
+                    </div>
+                    <div style="display:flex;gap:16px;flex-direction:column">
+                        <div style="display:flex;gap:10px;align-items:center">
+                            <button class="btn btn-primary" id="btn-nueva-consulta">
+                                <i data-lucide="plus-circle"></i>
+                                Nueva Consulta
+                            </button>
+                            <button class="btn" id="btn-comparar-consultas">
+                                <i data-lucide="git-compare"></i>
+                                Comparar Resultados
+                            </button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title"><i data-lucide="clipboard-list"></i> Consultas Registradas</div>
+                            </div>
+                            <div class="card-body" id="consultas-list">
+                                <div class="empty-state">
+                                    <i data-lucide="clipboard-list"></i>
+                                    <p>No hay consultas registradas.<br>
+                                    <small style="font-size:11px">Este módulo requiere implementar <code>backend/consultas.py</code>.</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ AGENTE INTELIGENTE ══════════════════════ -->
+            <section id="tab-agent" class="tab-pane">
+                <div class="legacy-tab">
+                    <div class="pane-header">
+                        <h3>Agente de Consultas</h3>
+                        <p>Pregunta en lenguaje natural sobre los voceros y consejos comunales de los expedientes.</p>
+                    </div>
+                    <div style="max-width:860px">
+                        <div class="chat-display" id="agent-chat" style="height:380px">
+                            <div class="message">
+                                <div class="message-avatar">AG</div>
+                                <div class="message-content">
+                                    <p>Saludos. Soy el Agente de Consultas de la Comuna. Puedo buscar información en los expedientes digitales de los consejos comunales.</p>
+                                    <p style="margin-top:8px;font-size:12px;color:var(--txt-muted)"><strong>Ejemplos:</strong><br>
+                                    • "Busca los voceros de la Unidad de Contraloría Social"<br>
+                                    • "Dime los voceros del Consejo Comunal Sur América"<br>
+                                    • "Cuántos voceros hay en cada consejo comunal"<br>
+                                    • "Lista los voceros principales del consejo La Victoria"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <form id="form-agent" class="search-form">
+                            <input type="text" id="input-agent" placeholder="Escribe tu consulta en lenguaje natural..." required autocomplete="off">
+                            <button type="submit" class="btn btn-primary">
+                                <i data-lucide="send"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ BÚSQUEDA UNIVERSAL ═══════════════════════ -->
+            <section id="tab-universal" class="tab-pane">
+                <div class="legacy-tab">
+                    <div class="pane-header">
+                        <h3>🔍 Agente de Búsqueda Universal</h3>
+                        <p>Busca en voceros, actas, cartas, actividades, tareas y documentos — todo en un solo lugar.</p>
+                    </div>
+
+                    <div class="quick-queries" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
+                        <button class="btn btn-secondary btn-sm" onclick="universalQuery('voceros activos por consejo comunal')">📋 Voceros por consejo</button>
+                        <button class="btn btn-secondary btn-sm" onclick="universalQuery('tareas pendientes y vencidas')">⏰ Tareas pendientes</button>
+                        <button class="btn btn-secondary btn-sm" onclick="universalQuery('últimas cartas enviadas')">📨 Últimas cartas</button>
+                        <button class="btn btn-secondary btn-sm" onclick="universalQuery('actividades del mes')">📅 Actividades del mes</button>
+                    </div>
+
+                    <div class="search-workspace">
+                        <div class="chat-display" id="chat-universal">
+                            <div class="message assistant-message">
+                                <div class="message-avatar">IA</div>
+                                <div class="message-content">
+                                    <p><strong>Hola, soy el Agente de Búsqueda Universal.</strong><br>
+                                    Puedes preguntarme cualquier cosa sobre la comuna: voceros, actas, cartas, actividades, tareas o documentos archivados. Busco en todas las fuentes automáticamente.<br><br>
+                                    Ejemplos:<br>
+                                    • <em>"¿Quién es el vocero de Contraloría en Manuelita Sáenz?"</em><br>
+                                    • <em>"¿Qué cartas enviamos a Hidróandes este año?"</em><br>
+                                    • <em>"Busca el presupuesto del proyecto del parque"</em></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="search-input-area">
+                            <form class="search-form" id="form-universal">
+                                <input type="text" id="input-universal" placeholder="Escribe tu consulta aquí...">
+                                <button type="submit" class="btn btn-primary"><i data-lucide="send"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ ACTAS DE ELECCIÓN ═══════════════════════ -->
+            <section id="tab-actas" class="tab-pane">
+                <div class="legacy-tab">
+                    <div class="pane-header">
+                        <h3>Acta de Elección de Vocerías</h3>
+                        <p>Sube el acta PDF desde el Ministerio de las Comunas para extraer automáticamente los voceros, código de registro y datos del consejo comunal.</p>
+                    </div>
+                    <div class="layout-grid" style="grid-template-columns:1fr 1fr">
+                        <!-- Upload -->
+                        <div class="card-form">
+                            <form id="form-acta-upload">
+                                <div class="form-group">
+                                    <label>Archivo PDF del Acta</label>
+                                    <input type="file" id="acta-pdf-input" accept=".pdf" required style="font-size:13px">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block" id="btn-acta-upload">
+                                    <i data-lucide="upload"></i><span>Extraer Datos del Acta</span>
+                                </button>
+                            </form>
+                            <div id="acta-upload-progress" style="display:none;margin-top:12px;font-size:12px;color:var(--txt-muted)">
+                                <i data-lucide="loader" class="spin"></i> Procesando PDF...
+                            </div>
+                        </div>
+                        <!-- Preview -->
+                        <div class="card-list" id="acta-preview-container" style="display:none">
+                            <h4 style="font-size:13px;font-weight:600;margin-bottom:8px">Datos Extraídos</h4>
+                            <div id="acta-preview"></div>
+                            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+                                <button class="btn btn-primary" id="btn-acta-save" style="display:none">
+                                    <i data-lucide="save"></i><span>Guardar en Base de Datos</span>
+                                </button>
+                                <button class="btn" id="btn-acta-otra" style="display:none">
+                                    <i data-lucide="plus"></i><span>Subir Otra Acta</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Lista de actas subidas -->
+                    <div style="margin-top:24px">
+                        <h4 style="font-size:14px;font-weight:600;margin-bottom:8px">Actas Registradas</h4>
+                        <div id="actas-list"><div class="empty-state">No hay actas registradas aún.</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ INFORMES ═══════════════════════════════ -->
+            <section id="tab-reports" class="tab-pane">
+                <div class="legacy-tab">
+                    <div class="pane-header">
+                        <h3>Informes de Gestión y Rendición</h3>
+                        <p>Genera reportes formales con gráficos para asambleas y entes ministeriales.</p>
+                    </div>
+                    <div class="layout-grid-reports">
+                        <div class="card-report-generator">
+                            <h4 style="font-size:13px;font-weight:600;margin-bottom:6px">Compilar Informe</h4>
+                            <p style="font-size:12px;color:var(--txt-muted);margin-bottom:4px">Selecciona el período. Se generará PDF + HTML + Word (.docx).</p>
+                            <div class="report-options">
+                                <button class="btn-report" data-period="diario"><i data-lucide="file-text"></i><span>Informe Diario (Hoy)</span></button>
+                                <button class="btn-report" data-period="semanal"><i data-lucide="calendar"></i><span>Informe Semanal (7 días)</span></button>
+                                <button class="btn-report" data-period="mensual"><i data-lucide="clock"></i><span>Informe Mensual (30 días)</span></button>
+                                <button class="btn-report" data-period="anual"><i data-lucide="calendar-check"></i><span>Informe Anual (365 días)</span></button>
+                            </div>
+                        </div>
+                        <div class="card-report-status">
+                            <h4 style="font-size:13px;font-weight:600;margin-bottom:12px">Informes Generados</h4>
+                            <div id="report-output-container">
+                                <div class="empty-state">No has generado informes en esta sesión.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ TAREAS ═════════════════════════════════ -->
+            <section id="tab-tasks" class="tab-pane">
+                <div class="legacy-tab">
+                    <div class="pane-header">
+                        <h3>Calendario de Tareas y Alertas</h3>
+                        <p>Agenda actividades. Se sincronizan con Google Calendar y te notifican por Telegram.</p>
+                    </div>
+                    <div class="layout-grid">
+                        <div class="card-form">
+                            <form id="form-task">
+                                <div class="form-group"><label>Título</label><input type="text" id="task-title" placeholder="Ej. Reunión con Ministerio de Comunas" required></div>
+                                <div class="form-group"><label>Descripción</label><textarea id="task-desc" rows="3" placeholder="Detalles..."></textarea></div>
+                                <div class="form-row">
+                                    <div class="form-group col-6"><label>Responsable (opcional)</label><input type="text" id="task-responsable" placeholder="Juan Pérez"></div>
+                                    <div class="form-group col-6"><label>Consejo Comunal (opcional, ID)</label><input type="number" id="task-consejo" placeholder="ID"></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6"><label>Fecha y Hora</label><input type="datetime-local" id="task-date" required></div>
+                                    <div class="form-group col-6"><label>Días de anticipación para alerta</label><input type="number" id="task-reminder" value="1" min="1" max="7"></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block"><i data-lucide="plus-circle"></i><span>Agendar Tarea</span></button>
+                            </form>
+                        </div>
+                        <div class="card-list">
+                            <h4 style="font-size:13px;font-weight:600;margin-bottom:12px">Agenda Comunal</h4>
+                            <div class="list-container" id="tasks-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+// ─── Inicialización ────────────────────────────────────────────────
+lucide.createIcons();
+
+const API = '';  // Vacío = mismo origen
+
+// ─── Navegación entre tabs ─────────────────────────────────────────
+const NAV_META = {
+    dashboard:   { title: 'Dashboard General',              sub: 'Vista consolidada de la gestión comunal',    action: null },
+    padron:      { title: 'Padrón de Voceros',              sub: 'Directiva y estructura de todos los consejos', action: { label: 'Agregar Vocero', fn: () => openModal('modal-vocero') } },
+    search:      { title: 'Consulta Inteligente de Archivos', sub: 'Búsqueda RAG en documentos de la comuna',  action: null },
+    letters:     { title: 'Generar Oficios',                sub: 'Cartas oficiales con IA',                    action: null },
+    activities:  { title: 'Bitácora Comunal',               sub: 'Registro de actividades y eventos',         action: null },
+    consultas:   { title: 'Consultas Populares',            sub: 'Resultados, análisis y comparativas',       action: { label: 'Nueva Consulta', fn: () => openModal('modal-consulta') } },
+    agent:       { title: 'Agente de Consultas',            sub: 'Búsqueda inteligente en expedientes comunales', action: null },
+    universal:   { title: 'Búsqueda Universal',             sub: 'Voceros, actas, cartas, actividades, tareas y documentos', action: null },
+    actas:       { title: 'Acta de Elección',              sub: 'Extraer voceros y datos desde PDF del MPPPST',  action: null },
+    reports:     { title: 'Informes de Gestión',            sub: 'PDF, HTML y Word de actividades',           action: null },
+    tasks:       { title: 'Tareas y Alertas',               sub: 'Agenda comunal con Google Calendar',        action: null },
+};
+
+function switchTab(id) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === id));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === `tab-${id}`));
+    const m = NAV_META[id] || {};
+    document.getElementById('topbar-title').textContent = m.title || '';
+    document.getElementById('topbar-sub').textContent   = m.sub   || '';
+    const btnAction = document.getElementById('btn-topbar-action');
+    if (m.action) {
+        btnAction.style.display = 'inline-flex';
+        document.getElementById('btn-topbar-label').textContent = m.action.label;
+        btnAction.onclick = m.action.fn;
+    } else {
+        btnAction.style.display = 'none';
+    }
+    lucide.createIcons();
+    if (id === 'dashboard') loadDashboard();
+    if (id === 'padron')    loadPadron();
+    if (id === 'activities') loadActivities();
+    if (id === 'letters')  loadLetterTypes(); loadLettersList();
+    if (id === 'tasks')    loadTasks();
+    if (id === 'consultas') loadConsultas();
+    if (id === 'actas') setupActasTab();
+    if (id === 'universal') setTimeout(() => lucide.createIcons(), 100);
+}
+
+document.querySelectorAll('.nav-btn[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+// ─── Modales ───────────────────────────────────────────────────────
+function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    if (id === 'modal-vocero') populateConsejoSelect();
+    lucide.createIcons();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ─── Toasts ────────────────────────────────────────────────────────
+function toast(type, msg) {
+    const c = document.getElementById('toasts');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+}
+
+// ─── Loading ───────────────────────────────────────────────────────
+function showLoading(msg = 'Procesando...') {
+    document.getElementById('loading-msg').textContent = msg;
+    document.getElementById('loading').style.display = 'flex';
+}
+
+function hideLoading() { document.getElementById('loading').style.display = 'none'; }
+
+// ─── Helpers ───────────────────────────────────────────────────────
+async function apiFetch(path, opts = {}) {
+    const res = await fetch(API + path, opts);
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || 'Error de servidor');
+    }
+    return res.json();
+}
+
+function initials(name) {
+    return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function badgeClass(unidad) {
+    const map = {
+        'Ejecutiva': 'badge-ejecutiva',
+        'Administración y Finanzas': 'badge-finanzas',
+        'Contraloría Social': 'badge-contraloria',
+        'Legislativa': 'badge-legislativa',
+    };
+    return map[unidad] || 'badge-otro';
+}
+
+// ─── DASHBOARD ─────────────────────────────────────────────────────
+let chartCategorias = null;
+
+async function loadDashboard() {
+    try {
+        // Load stats from new API
+        const stats = await apiFetch('/api/dashboard/stats').catch(() => null);
+        const acts = await apiFetch('/api/activities').catch(() => []);
+        const tasks = await apiFetch('/api/tasks').catch(() => []);
+        
+        if (stats) {
+            document.getElementById('kpi-acts').textContent    = stats.actividades_mes;
+            document.getElementById('kpi-part').textContent    = (stats.participantes_mes || 0).toLocaleString();
+            document.getElementById('kpi-cartas').textContent  = stats.cartas_mes;
+            document.getElementById('kpi-tareas').textContent  = stats.tareas_pendientes;
+            if (document.getElementById('kpi-vencidas')) {
+                document.getElementById('kpi-vencidas').textContent = stats.tareas_vencidas;
+            }
+        }
+
+        const tareasPendientes = tasks.filter(t => !t.completada);
+        document.getElementById('badge-tasks').textContent = tareasPendientes.length;
+
+        // Chart
+        const last30 = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
+        const actsLast30 = acts.filter(a => a.fecha >= last30);
+        const conteos = {};
+        actsLast30.forEach(a => { conteos[a.categoria] = (conteos[a.categoria] || 0) + 1; });
+        const labels = Object.keys(conteos);
+        const values = Object.values(conteos);
+
+        const palette = ['#3b82f6','#22c55e','#f59e0b','#a855f7','#14b8a6','#ef4444','#f97316'];
+        const ctx = document.getElementById('chart-categorias').getContext('2d');
+        if (chartCategorias) chartCategorias.destroy();
+        chartCategorias = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels.length ? labels : ['Sin actividades'],
+                datasets: [{
+                    data: values.length ? values : [0],
+                    backgroundColor: labels.map((_, i) => palette[i % palette.length]),
+                    borderRadius: 6,
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1c2230',
+                        borderColor: '#2a3342',
+                        borderWidth: 1,
+                        titleColor: '#e6edf3',
+                        bodyColor: '#8b949e',
+                    }
+                },
+                scales: {
+                    x: { grid: { color: '#1c2230' }, ticks: { color: '#8b949e', font: { family: 'DM Sans' } } },
+                    y: { grid: { color: '#1c2230' }, ticks: { color: '#8b949e', stepSize: 1 } }
+                }
+            }
+        });
+
+        // Mini tasks
+        const container = document.getElementById('dash-mini-tasks');
+        const upcoming = tareasPendientes.slice(0, 4);
+        if (upcoming.length === 0) {
+            container.innerHTML = '<div class="empty-state" style="padding:20px 0"><p>Sin tareas pendientes</p></div>';
+        } else {
+            container.innerHTML = upcoming.map(t => {
+                const d = new Date(t.fecha_limite);
+                const diff = Math.ceil((d - Date.now()) / 864e5);
+                const dotClass = diff <= 1 ? 'urgent' : diff <= 3 ? 'soon' : '';
+                return `<div class="mini-task">
+                    <div class="task-dot ${dotClass}"></div>
+                    <div>
+                        <div class="task-name">${escapeHTML(t.titulo)}</div>
+                        <div class="task-when">${d.toLocaleDateString('es-VE', { day:'2-digit', month:'short', year:'numeric' })}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // Last activity
+        const lastActContainer = document.getElementById('dash-last-activity');
+        const ultimas = stats ? stats.ultimas_actividades : acts;
+        if (!ultimas || ultimas.length === 0) {
+            lastActContainer.innerHTML = '<div class="empty-state" style="padding:20px 0"><p>Sin actividades registradas</p></div>';
+        } else {
+            const last = ultimas[0];
+            lastActContainer.innerHTML = `
+                <div class="activity-snippet">
+                    <div class="act-icon-wrap"><i data-lucide="calendar-check"></i></div>
+                    <div>
+                        <div class="act-meta">${escapeHTML(last.fecha)} · <span class="badge badge-ejecutiva">${escapeHTML(last.categoria)}</span> · ${last.participantes} participantes</div>
+                        <div class="act-desc">${escapeHTML(last.descripcion.slice(0, 160))}${last.descripcion.length > 160 ? '…' : ''}</div>
+                    </div>
+                </div>`;
+            lucide.createIcons();
+        }
+
+    } catch (e) {
+        console.error('Dashboard load error:', e);
+    }
+}
+
+// ─── Búsqueda rápida de voceros (dashboard) ────────────────────────
+let vocerosCached = [];
+
+document.getElementById('dash-search-vocero').addEventListener('input', async function () {
+    const q = this.value.trim().toLowerCase();
+    const results = document.getElementById('dash-vocero-results');
+    if (q.length < 2) {
+        results.innerHTML = '<span style="color:var(--txt-muted)">Escribe al menos 2 caracteres.</span>';
+        return;
+    }
+    try {
+        const data = await apiFetch(`/api/padron/voceros/buscar?q=${encodeURIComponent(q)}`);
+        if (!data.length) {
+            results.innerHTML = '<span style="color:var(--txt-muted)">Sin resultados.</span>';
+            return;
+        }
+        results.innerHTML = data.slice(0, 3).map(v => `
+            <div style="padding:8px 0; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px">
+                <div class="avatar" style="width:28px;height:28px;font-size:10px">${initials(v.nombre_completo)}</div>
+                <div>
+                    <div style="font-size:12px;font-weight:600">${escapeHTML(v.nombre_completo)}</div>
+                    <div style="font-size:11px;color:var(--txt-muted)">${escapeHTML(v.cargo)} · ${escapeHTML(v.consejo_nombre) || 'Sin consejo'}</div>
+                </div>
+                <span class="badge ${badgeClass(v.unidad)}" style="margin-left:auto">${escapeHTML(v.unidad)}</span>
+            </div>
+        `).join('');
+    } catch {
+        results.innerHTML = '<span style="color:var(--txt-muted)">Servicio no disponible. Implementar /api/padron</span>';
+    }
+});
+
+async function quickReportUnidad(unidad) {
+    try {
+        const data = await apiFetch(`/api/padron/voceros?unidad=${encodeURIComponent(unidad)}`);
+        if (!data.length) { toast('info', `No hay voceros en la unidad ${unidad}`); return; }
+        switchTab('padron');
+        document.querySelectorAll('.unidad-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.unidad === unidad);
+        });
+        renderVoceros(data);
+    } catch {
+        toast('info', 'Servicio no disponible. Implementar /api/padron');
+        switchTab('padron');
+    }
+}
+
+// ─── PADRÓN ────────────────────────────────────────────────────────
+let consejosCached = [];
+let vocerosCachedFull = [];
+let activeUnidad = 'all';
+
+async function loadPadron() {
+    await loadConsejos();
+    await loadVoceros();
+}
+
+async function loadConsejos() {
+    try {
+        const data = await apiFetch('/api/padron/consejos');
+        consejosCached = data;
+        renderConsejos(data);
+        updateConsejoSelects(data);
+    } catch {
+        renderConsejos([]);
+    }
+}
+
+function renderConsejos(data) {
+    const grid = document.getElementById('consejos-grid');
+    document.getElementById('consejos-count').textContent = `${data.length} consejo${data.length !== 1 ? 's' : ''}`;
+    if (!data.length) {
+        grid.innerHTML = `<div class="empty-state">
+            <i data-lucide="building-2"></i>
+            <p>No hay consejos registrados aún.</p>
+            <button class="btn btn-primary" style="margin:12px auto 0;display:flex" onclick="openModal('modal-consejo')">Registrar primero</button>
+        </div>`;
+        lucide.createIcons();
+        return;
+    }
+    grid.innerHTML = data.map(c => `
+        <div class="consejo-card" onclick="filterByConsejo(${c.id})">
+            <div class="consejo-nombre">${escapeHTML(c.nombre)}</div>
+            <div class="consejo-parroquia">${escapeHTML(c.parroquia || '')} ${c.municipio ? '· ' + escapeHTML(c.municipio) : ''}</div>
+            <div class="consejo-stats">
+                <div class="consejo-stat">
+                    <div class="consejo-stat-val">${c.total_voceros || 0}</div>
+                    <div class="consejo-stat-lbl">Voceros</div>
+                </div>
+                <div class="consejo-stat">
+                    <div class="consejo-stat-val">${c.activo ? 'Activo' : 'Inactivo'}</div>
+                    <div class="consejo-stat-lbl">Estado</div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateConsejoSelects(data) {
+    const opts = data.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+    document.getElementById('v-consejo').innerHTML         = '<option value="">Seleccionar...</option>' + opts;
+    document.getElementById('vocero-filter-consejo').innerHTML = '<option value="">Todos los consejos</option>' + opts;
+}
+
+function populateConsejoSelect() { updateConsejoSelects(consejosCached); }
+
+async function loadVoceros(filtros = {}) {
+    try {
+        const params = new URLSearchParams();
+        if (filtros.unidad && filtros.unidad !== 'all') params.set('unidad', filtros.unidad);
+        if (filtros.consejo_id) params.set('consejo_id', filtros.consejo_id);
+        if (filtros.q) params.set('q', filtros.q);
+        const data = await apiFetch(`/api/padron/voceros?${params}`);
+        vocerosCachedFull = data;
+        renderVoceros(data);
+    } catch {
+        renderVoceros([]);
+    }
+}
+
+function renderVoceros(data) {
+    const tbody = document.getElementById('voceros-tbody');
+    document.getElementById('voceros-count').textContent = `${data.length} vocero${data.length !== 1 ? 's' : ''}`;
+    if (!data.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i data-lucide="users"></i><p>No hay voceros para mostrar.</p></div></td></tr>`;
+        lucide.createIcons();
+        return;
+    }
+    tbody.innerHTML = data.map(v => `
+        <tr>
+            <td>
+                <div class="td-name">
+                    <div class="avatar">${initials(v.nombre_completo)}</div>
+                    <div>
+                        <div class="name-text">${escapeHTML(v.nombre_completo)}</div>
+                        <div class="name-cedula">${escapeHTML(v.cedula) || '—'}</div>
+                    </div>
+                </div>
+            </td>
+            <td>${escapeHTML(v.cargo)}</td>
+            <td><span class="badge ${badgeClass(v.unidad)}">${escapeHTML(v.unidad)}</span></td>
+            <td style="font-size:12px;color:var(--txt-muted)">${escapeHTML(v.consejo_nombre) || '—'}</td>
+            <td style="font-size:12px">${escapeHTML(v.telefono) || '—'}</td>
+            <td><span class="badge" style="${v.activo ? 'background:rgba(34,197,94,0.1);color:#22c55e' : 'background:rgba(239,68,68,0.1);color:#ef4444'}">${v.activo ? 'Activo' : 'Inactivo'}</span></td>
+        </tr>
+    `).join('');
+}
+
+function filterByConsejo(id) {
+    document.getElementById('vocero-filter-consejo').value = id;
+    loadVoceros({ consejo_id: id, unidad: activeUnidad });
+}
+
+// Filtros de unidad
+document.querySelectorAll('.unidad-btn[data-unidad]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.unidad-btn[data-unidad]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeUnidad = btn.dataset.unidad;
+        loadVoceros({ unidad: activeUnidad });
+    });
+});
+
+// Search
+let searchTimeout;
+document.getElementById('vocero-search').addEventListener('input', function () {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        loadVoceros({ q: this.value, unidad: activeUnidad });
+    }, 350);
+});
+
+document.getElementById('vocero-filter-consejo').addEventListener('change', function () {
+    loadVoceros({ consejo_id: this.value, unidad: activeUnidad });
+});
+
+// ─── Formulario: Nuevo Consejo ─────────────────────────────────────
+document.getElementById('form-consejo').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    showLoading('Registrando consejo...');
+    try {
+        await apiFetch('/api/padron/consejos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nombre: document.getElementById('c-nombre').value,
+                parroquia: document.getElementById('c-parroquia').value,
+                municipio: document.getElementById('c-municipio').value,
+                rif: document.getElementById('c-rif').value,
+                telefono: document.getElementById('c-telefono').value,
+                direccion: document.getElementById('c-direccion').value,
+            })
+        });
+        toast('success', 'Consejo comunal registrado.');
+        closeModal('modal-consejo');
+        this.reset();
+        await loadConsejos();
+    } catch (err) {
+        toast('error', err.message || 'Error al registrar consejo');
+    } finally { hideLoading(); }
+});
+
+// ─── Formulario: Nuevo Vocero ──────────────────────────────────────
+document.getElementById('form-vocero').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    showLoading('Registrando vocero...');
+    try {
+        await apiFetch('/api/padron/voceros', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nombre_completo: document.getElementById('v-nombre').value,
+                cedula: document.getElementById('v-cedula').value,
+                cargo: document.getElementById('v-cargo').value,
+                unidad: document.getElementById('v-unidad').value,
+                consejo_comunal_id: document.getElementById('v-consejo').value,
+                telefono: document.getElementById('v-telefono').value,
+            })
+        });
+        toast('success', 'Vocero registrado correctamente.');
+        closeModal('modal-vocero');
+        this.reset();
+        await loadVoceros({ unidad: activeUnidad });
+    } catch (err) {
+        toast('error', err.message || 'Error al registrar vocero');
+    } finally { hideLoading(); }
+});
+
+// ─── Export XLSX ───────────────────────────────────────────────────
+document.getElementById('btn-export-xlsx').addEventListener('click', async () => {
+    try {
+        window.open(API + '/api/padron/exportar-xlsx', '_blank');
+    } catch (e) { toast('error', 'Error al exportar'); }
+});
+
+// ─── RAG Search ────────────────────────────────────────────────────
+document.getElementById('form-search').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const q = document.getElementById('input-query').value.trim();
+    if (!q) return;
+    const chat = document.getElementById('search-chat');
+    chat.innerHTML += `<div class="message user-message"><div class="message-content"><p>${escapeHTML(q)}</p></div><div class="message-avatar"><i data-lucide="user" style="width:14px;height:14px"></i></div></div>`;
+    lucide.createIcons();
+    document.getElementById('input-query').value = '';
+    showLoading('Consultando documentos...');
+    try {
+        const r = await apiFetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pregunta: q }) });
+        const sources = r.fuentes?.length ? `<p style="margin-top:8px;font-size:11px;color:var(--txt-muted)">📄 ${r.fuentes.map(escapeHTML).join(', ')}</p>` : '';
+        chat.innerHTML += `<div class="message"><div class="message-avatar">CPPO</div><div class="message-content"><p>${escapeHTML(r.respuesta)}</p>${sources}</div></div>`;
+        lucide.createIcons();
+        chat.scrollTop = chat.scrollHeight;
+    } catch (err) { toast('error', err.message); } finally { hideLoading(); }
+});
+
+// ─── Agente Inteligente ────────────────────────────────────────────
+document.getElementById('form-agent').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const q = document.getElementById('input-agent').value.trim();
+    if (!q) return;
+    const chat = document.getElementById('agent-chat');
+
+    // Mensaje del usuario
+    chat.innerHTML += `<div class="message user-message"><div class="message-content"><p>${q.replace(/</g,'&lt;')}</p></div><div class="message-avatar"><i data-lucide="user" style="width:14px;height:14px"></i></div></div>`;
+    lucide.createIcons();
+    document.getElementById('input-agent').value = '';
+
+    // Loader
+    const loaderId = 'loader-' + Date.now();
+    chat.innerHTML += `<div class="message" id="${loaderId}"><div class="message-avatar">AG</div><div class="message-content"><p><i data-lucide="loader" class="animate-spin" style="display:inline-block;vertical-align:middle;margin-right:6px"></i>Consultando expedientes...</p></div></div>`;
+    lucide.createIcons();
+    chat.scrollTop = chat.scrollHeight;
+
+    showLoading('El agente está buscando en los expedientes...');
+    try {
+        const r = await apiFetch('/api/agent/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ consulta: q })
+        });
+
+        // Reemplazar loader con respuesta
+        const loaderEl = document.getElementById(loaderId);
+        if (loaderEl) loaderEl.remove();
+
+        let html = `<div class="message"><div class="message-avatar">AG</div><div class="message-content">`;
+        html += `<p>${escapeHTML(r.respuesta).replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`;
+
+        if (r.tabla) {
+            // Convertir markdown table a HTML table
+            const lines = r.tabla.split('\n');
+            let tableHtml = '<div style="overflow-x:auto;margin-top:12px"><table style="font-size:11px;width:100%">';
+            let inTable = false;
+            for (const line of lines) {
+                if (line.startsWith('|') && line.endsWith('|')) {
+                    const cells = line.split('|').filter(c => c.trim());
+                    if (!inTable) {
+                        tableHtml += '<thead><tr>';
+                        cells.forEach(c => { tableHtml += `<th style="padding:4px 8px;text-align:left">${escapeHTML(c.trim())}</th>`; });
+                        tableHtml += '</tr></thead><tbody>';
+                        inTable = true;
+                    } else if (line.includes('---')) {
+                        continue;
+                    } else {
+                        tableHtml += '<tr>';
+                        cells.forEach(c => { tableHtml += `<td style="padding:4px 8px">${escapeHTML(c.trim())}</td>`; });
+                        tableHtml += '</tr>';
+                    }
+                }
+            }
+            if (inTable) tableHtml += '</tbody></table></div>';
+            html += tableHtml;
+        }
+
+        if (r.total_resultados !== undefined) {
+            html += `<p style="margin-top:10px;font-size:11px;color:var(--txt-muted)">📊 ${r.total_resultados} resultado(s)</p>`;
+        }
+
+        html += `</div></div>`;
+        chat.innerHTML += html;
+        lucide.createIcons();
+        chat.scrollTop = chat.scrollHeight;
+    } catch (err) {
+        const loaderEl = document.getElementById(loaderId);
+        if (loaderEl) loaderEl.remove();
+        chat.innerHTML += `<div class="message"><div class="message-avatar">AG</div><div class="message-content"><p style="color:var(--red)">Error: ${escapeHTML(err.message)}</p></div></div>`;
+        lucide.createIcons();
+        chat.scrollTop = chat.scrollHeight;
+    } finally { hideLoading(); }
+});
+
+// ─── Agente Universal ────────────────────────────────────────────
+function markdownToHTML(text) {
+    if (!text) return '';
+    return escapeHTML(text)
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+}
+
+async function universalQuery(query) {
+    const input = document.getElementById('input-universal');
+    if (input) { input.value = query; }
+    document.getElementById('form-universal').dispatchEvent(new Event('submit'));
+}
+
+document.getElementById('form-universal').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const q = document.getElementById('input-universal').value.trim();
+    if (!q) return;
+    const chat = document.getElementById('chat-universal');
+    chat.innerHTML += `<div class="message user-message"><div class="message-content"><p>${escapeHTML(q)}</p></div><div class="message-avatar"><i data-lucide="user" style="width:14px;height:14px"></i></div></div>`;
+    lucide.createIcons();
+    document.getElementById('input-universal').value = '';
+    chat.scrollTop = chat.scrollHeight;
+
+    const loaderId = 'uloader-' + Date.now();
+    chat.innerHTML += `<div class="message" id="${loaderId}"><div class="message-avatar">IA</div><div class="message-content"><p><i data-lucide="loader" class="animate-spin" style="display:inline-block;vertical-align:middle;margin-right:6px"></i> Buscando en todas las fuentes...</p></div></div>`;
+    lucide.createIcons();
+    chat.scrollTop = chat.scrollHeight;
+
+    try {
+        const r = await apiFetch('/api/universal/consulta', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: q, formato: 'markdown' })
+        });
+
+        const loaderEl = document.getElementById(loaderId);
+        if (!loaderEl) return;
+
+        const fuentesBadges = (r.fuentes_usadas || []).map(f => `<span class="badge" style="background:rgba(37,99,235,0.1);color:#60a5fa;font-size:10px">${escapeHTML(f)}</span>`).join(' ');
+        const footer = r.fuentes_usadas?.length
+            ? `<p style="margin-top:10px;font-size:11px;color:var(--txt-muted)">🔍 ${r.total_hallazgos || 0} resultado(s) en ${r.tiempo_ms || 0}ms · Fuentes: ${fuentesBadges}</p>`
+            : '';
+
+        loaderEl.innerHTML = `<div class="message-avatar">IA</div><div class="message-content"><div class="agent-response">${markdownToHTML(r.respuesta)}</div>${footer}</div>`;
+    } catch (err) {
+        const loaderEl = document.getElementById(loaderId);
+        if (loaderEl) loaderEl.remove();
+        chat.innerHTML += `<div class="message"><div class="message-avatar">IA</div><div class="message-content"><p style="color:var(--red)">Error: ${escapeHTML(err.message)}</p></div></div>`;
+    }
+    lucide.createIcons();
+    chat.scrollTop = chat.scrollHeight;
+});
+
+// ─── Cartas ────────────────────────────────────────────────────────
+async function loadLetterTypes() {
+    const sel = document.getElementById('letter-type');
+    if (sel.options.length > 1) return;
+    ['Solicitud','Denuncia','Convocatoria','Oficio','Acta','Informe','Constancia','Comunicado','Otro'].forEach(t => {
+        const o = new Option(t, t); sel.add(o);
+    });
+}
+
+let allLettersData = [];
+
+async function loadLettersList() {
+    try {
+        const data = await apiFetch('/api/letters/list');
+        allLettersData = data;
+        renderLettersList(data);
+    } catch {}
+}
+
+function renderLettersList(data) {
+    const c = document.getElementById('letters-list');
+    if (!data.length) { c.innerHTML = '<div class="empty-state">Sin cartas emitidas.</div>'; return; }
+    c.innerHTML = data.slice(0, 15).map(l => {
+        const pdfFn = l.pdf_path ? l.pdf_path.split(/[\\/]/).pop() : null;
+        const docxFn = l.docx_path ? l.docx_path.split(/[\\/]/).pop() : null;
+        const pdfEncoded = pdfFn ? encodeURIComponent(pdfFn) : null;
+        const docxEncoded = docxFn ? encodeURIComponent(docxFn) : null;
+        return `
+        <div class="list-item">
+            <div class="item-title">${escapeHTML(l.numero_oficio)} — ${escapeHTML(l.tipo)}</div>
+            <div class="item-meta">${escapeHTML(l.destinatario)} · ${escapeHTML(l.fecha)}</div>
+            ${l.vocero_firma ? `<div style="font-size:11px;color:var(--text-secondary);margin-top:2px">Firma: ${escapeHTML(l.vocero_firma)}</div>` : ''}
+            <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+                ${pdfFn ? `<a href="/cartas/${pdfEncoded}" target="_blank" class="btn btn-sm" style="font-size:10px;padding:3px 8px"><i data-lucide="file-text" style="width:11px;height:11px"></i> PDF</a>` : ''}
+                ${docxFn ? `<a href="/cartas/${docxEncoded}" download class="btn btn-sm" style="font-size:10px;padding:3px 8px"><i data-lucide="file-down" style="width:11px;height:11px"></i> DOCX</a>` : ''}
+                ${pdfFn ? `<button onclick="window.open('/cartas/${pdfEncoded}','_blank')" class="btn btn-sm" style="font-size:10px;padding:3px 8px"><i data-lucide="printer" style="width:11px;height:11px"></i> Imprimir</button>` : ''}
+            </div>
+        </div>`}).join('');
+    lucide.createIcons();
+}
+
+// Búsqueda de voceros para firma
+const signerSearch = document.getElementById('letter-signer-search');
+const signerDropdown = document.getElementById('letter-signer-dropdown');
+const signerId = document.getElementById('letter-signer-id');
+const signerInfo = document.getElementById('letter-signer-info');
+let signerTimeout = null;
+
+if (signerSearch) {
+    signerSearch.addEventListener('input', function() {
+        clearTimeout(signerTimeout);
+        const q = this.value.trim();
+        if (q.length < 2) { signerDropdown.style.display = 'none'; return; }
+        signerTimeout = setTimeout(async () => {
+            try {
+                const voceros = await apiFetch(`/api/padron/voceros?q=${encodeURIComponent(q)}`);
+                if (!voceros.length) { signerDropdown.style.display = 'none'; return; }
+                signerDropdown.innerHTML = voceros.map(v => `
+                    <div style="padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px"
+                         onmouseover="this.style.background='var(--bg-secondary)'" 
+                         onmouseout="this.style.background='transparent'"
+                         data-id="${v.id}" data-nombre="${escapeHTML(v.nombre)}" data-cargo="${escapeHTML(v.cargo || '')}" data-telefono="${escapeHTML(v.telefono || '')}">
+                        <strong>${escapeHTML(v.nombre)}</strong><br>
+                        <span style="color:var(--text-secondary)">${escapeHTML(v.cargo || '')} ${v.consejo_nombre ? '· ' + escapeHTML(v.consejo_nombre) : ''}</span>
+                    </div>`).join('');
+                signerDropdown.style.display = 'block';
+                signerDropdown.querySelectorAll('div[data-id]').forEach(el => {
+                    el.addEventListener('click', () => {
+                        signerId.value = el.dataset.id;
+                        signerSearch.value = el.dataset.nombre;
+                        document.getElementById('letter-signer-name').textContent = el.dataset.nombre;
+                        document.getElementById('letter-signer-cargo').textContent = el.dataset.cargo + (el.dataset.telefono ? ' · Tel: ' + el.dataset.telefono : '');
+                        signerInfo.style.display = 'block';
+                        signerDropdown.style.display = 'none';
+                    });
+                });
+            } catch {}
+        }, 300);
+    });
+
+    signerSearch.addEventListener('blur', () => { setTimeout(() => { signerDropdown.style.display = 'none'; }, 200); });
+}
+
+// Búsqueda en lista de oficios
+const lettersSearch = document.getElementById('letters-search');
+if (lettersSearch) {
+    lettersSearch.addEventListener('input', function() {
+        const q = this.value.toLowerCase().trim();
+        if (!q) { renderLettersList(allLettersData); return; }
+        const filtered = allLettersData.filter(l =>
+            (l.numero_oficio || '').toLowerCase().includes(q) ||
+            (l.destinatario || '').toLowerCase().includes(q) ||
+            (l.asunto || '').toLowerCase().includes(q) ||
+            (l.tipo || '').toLowerCase().includes(q)
+        );
+        renderLettersList(filtered);
+    });
+}
+
+document.getElementById('form-letter').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    showLoading('Generando carta con IA...');
+    try {
+        const r = await apiFetch('/api/letters', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tipo: document.getElementById('letter-type').value,
+                destinatario: document.getElementById('letter-to').value,
+                cargo_destinatario: document.getElementById('letter-to-cargo').value,
+                asunto: document.getElementById('letter-subject').value,
+                instrucciones: document.getElementById('letter-prompt').value,
+                vocero_firma_id: signerId.value || null,
+            })
+        });
+        toast('success', `Carta generada: ${r.numero_oficio}`);
+        this.reset();
+        signerId.value = '';
+        signerInfo.style.display = 'none';
+        await loadLettersList();
+    } catch (err) { toast('error', err.message); } finally { hideLoading(); }
+});
+
+// ─── Actividades ───────────────────────────────────────────────────
+// Variables para control de edición
+let editingActivityId = null;
+
+async function loadActivities() {
+    const sel = document.getElementById('act-category');
+    if (sel.options.length <= 1) {
+        try {
+            const cats = await apiFetch('/api/activities/categories');
+            // Limpiar selector y poner opción por defecto si es necesario, o mantener las existentes
+            sel.innerHTML = '<option value="">Seleccionar...</option>';
+            cats.forEach(c => { sel.add(new Option(c, c)); });
+        } catch {}
+    }
+    try {
+        const data = await apiFetch('/api/activities');
+        const c = document.getElementById('activities-list');
+        if (!data.length) { c.innerHTML = '<div class="empty-state">Sin actividades.</div>'; return; }
+        
+        // Renderizar las actividades con botones de Editar y Eliminar
+        c.innerHTML = data.map(a => {
+            // Generar vista previa de fotos si existen
+            let photosHtml = '';
+            if (a.fotos && a.fotos.length > 0) {
+                photosHtml = `<div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">`;
+                a.fotos.forEach(path => {
+                    const parts = path.split(/[\\/]/);
+                    const fn = parts[parts.length - 1];
+                    photosHtml += `<img src="/media/${encodeURIComponent(fn)}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; border:1px solid var(--border)">`;
+                });
+                photosHtml += `</div>`;
+            }
+
+            return `
+            <div class="list-item" style="display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <div style="flex:1;">
+                        <div class="item-title" style="font-weight:600;">${escapeHTML(a.descripcion.slice(0, 100))}${a.descripcion.length > 100 ? '…' : ''}</div>
+                        <div class="item-meta" style="font-size:11px; margin-top:2px;">
+                            ${escapeHTML(a.fecha)} · <span class="badge badge-ejecutiva">${escapeHTML(a.categoria)}</span> · ${a.participantes} participantes
+                        </div>
+                        ${photosHtml}
+                    </div>
+                    <div style="display:flex; gap:4px;">
+                        <button onclick="editActivity(${a.id}, '${a.fecha}', '${a.categoria.replace(/'/g, "\\'")}', '${a.descripcion.replace(/'/g, "\\'").replace(/\n/g, "\\n")}', ${a.participantes})" class="btn btn-secondary btn-sm" style="padding:2px 6px; font-size:10px;" title="Editar">
+                            <i data-lucide="edit-2" style="width:11px; height:11px;"></i>
+                        </button>
+                        <button onclick="deleteActivity(${a.id})" class="btn btn-danger btn-sm" style="padding:2px 6px; font-size:10px; background-color:#ef4444; color:white;" title="Eliminar">
+                            <i data-lucide="trash-2" style="width:11px; height:11px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+        lucide.createIcons();
+    } catch {}
+}
+
+function editActivity(id, fecha, categoria, descripcion, participantes) {
+    editingActivityId = id;
+    document.getElementById('act-date').value = fecha;
+    document.getElementById('act-category').value = categoria;
+    document.getElementById('act-desc').value = descripcion;
+    document.getElementById('act-participants').value = participantes;
+    
+    // Cambiar texto del botón
+    const btn = document.querySelector('#form-activity button[type="submit"]');
+    btn.innerHTML = `<i data-lucide="save"></i><span>Guardar Cambios</span>`;
+    lucide.createIcons();
+    
+    // Hacer scroll al formulario
+    document.getElementById('form-activity').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function deleteActivity(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta actividad?')) return;
+    showLoading('Eliminando actividad...');
+    try {
+        await apiFetch(`/api/activities/${id}`, { method: 'DELETE' });
+        toast('success', 'Actividad eliminada.');
+        await loadActivities();
+    } catch (err) {
+        toast('error', err.message);
+    } finally {
+        hideLoading();
+    }
+}
+
+document.getElementById('form-activity').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const photosInput = document.getElementById('act-photos');
+    const btnSubmit = document.querySelector('#form-activity button[type="submit"]');
+    
+    if (editingActivityId) {
+        // Modo Edición (PUT)
+        showLoading('Actualizando actividad...');
+        try {
+            await apiFetch(`/api/activities/${editingActivityId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fecha: document.getElementById('act-date').value,
+                    categoria: document.getElementById('act-category').value,
+                    descripcion: document.getElementById('act-desc').value,
+                    participantes: parseInt(document.getElementById('act-participants').value) || 0
+                })
+            });
+            toast('success', 'Actividad actualizada exitosamente.');
+            
+            // Resetear estado de edición
+            editingActivityId = null;
+            btnSubmit.innerHTML = `<i data-lucide="save"></i><span>Registrar Actividad</span>`;
+            this.reset();
+            document.getElementById('act-date').value = new Date().toISOString().split('T')[0];
+            await loadActivities();
+        } catch (err) {
+            toast('error', err.message);
+        } finally {
+            hideLoading();
+            lucide.createIcons();
+        }
+    } else {
+        // Modo Registro (POST)
+        showLoading('Registrando actividad...');
+        const fotos = [];
+        if (photosInput.files.length > 0) {
+            for (const file of photosInput.files) {
+                try {
+                    const fd = new FormData(); fd.append('file', file);
+                    const r = await apiFetch('/api/activities/upload-photo', { method: 'POST', body: fd });
+                    fotos.push(r.filepath);
+                } catch {}
+            }
+        }
+        try {
+            await apiFetch('/api/activities', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fecha: document.getElementById('act-date').value,
+                    categoria: document.getElementById('act-category').value,
+                    descripcion: document.getElementById('act-desc').value,
+                    participantes: parseInt(document.getElementById('act-participants').value) || 0,
+                    fotos
+                })
+            });
+            toast('success', 'Actividad registrada exitosamente.');
+            this.reset();
+            document.getElementById('act-date').value = new Date().toISOString().split('T')[0];
+            await loadActivities();
+        } catch (err) { toast('error', err.message); } finally { hideLoading(); }
+    }
+});
+
+// ─── Informes ──────────────────────────────────────────────────────
+document.querySelectorAll('.btn-report').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const period = btn.dataset.period;
+        showLoading(`Generando informe ${period}...`);
+        try {
+            const fd = new FormData(); fd.append('periodo', period);
+            const r = await apiFetch('/api/reports', { method: 'POST', body: fd });
+            const c = document.getElementById('report-output-container');
+            const openLink = r.nombre_archivo ? `<a href="/informes/${r.nombre_archivo}" target="_blank" class="btn" style="font-size:11px;margin-top:8px"><i data-lucide="external-link" style="width:12px;height:12px"></i> Abrir informe</a>` : '';
+            c.innerHTML = `<div class="list-item">
+                <div class="item-title">Informe ${r.tipo}</div>
+                <div class="item-meta">${r.total_actividades} actividades · ${r.total_participantes} participantes</div>
+                ${openLink}
+            </div>` + c.innerHTML;
+            lucide.createIcons();
+            toast('success', `Informe ${r.tipo} generado.`);
+        } catch (err) { toast('error', err.message); } finally { hideLoading(); }
+    });
+});
+
+// ─── Tareas ────────────────────────────────────────────────────────
+async function loadTasks() {
+    try {
+        const data = await apiFetch('/api/tasks');
+        const c = document.getElementById('tasks-list');
+        const pending = data.filter(t => !t.completada);
+        document.getElementById('badge-tasks').textContent = pending.length;
+        if (!data.length) { c.innerHTML = '<div class="empty-state">Sin tareas agendadas.</div>'; return; }
+        c.innerHTML = data.slice(0, 20).map(t => {
+            const cl = t.completada ? 'completed' : (new Date(t.fecha_limite) < new Date() ? 'overdue' : '');
+            return `
+            <div class="list-item">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                    <div class="item-title" style="${t.completada ? 'text-decoration:line-through;color:var(--txt-muted)' : ''}">${escapeHTML(t.titulo)}</div>
+                    ${!t.completada ? `<button onclick="completeTask(${t.id})" class="btn" style="font-size:10px;padding:3px 8px"><i data-lucide="check" style="width:11px;height:11px"></i> Hecho</button>` : ''}
+                </div>
+                <div class="item-meta">${escapeHTML(t.fecha_limite)}</div>
+            </div>`).join('');
+        lucide.createIcons();
+    } catch {}
+}
+
+async function completeTask(id) {
+    try {
+        await apiFetch(`/api/tasks/${id}/complete`, { method: 'PUT' });
+        toast('success', 'Tarea completada.');
+        await loadTasks();
+    } catch (err) { toast('error', err.message); }
+}
+
+document.getElementById('form-task').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    showLoading('Agendando tarea...');
+    try {
+        await apiFetch('/api/tasks', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                titulo: document.getElementById('task-title').value,
+                descripcion: document.getElementById('task-desc').value,
+                responsable: document.getElementById('task-responsable').value || null,
+                consejo_id: document.getElementById('task-consejo').value ? parseInt(document.getElementById('task-consejo').value) : null,
+                fecha_limite: document.getElementById('task-date').value.replace('T', ' '),
+                recordatorio_dias: parseInt(document.getElementById('task-reminder').value) || 1,
+            })
+        });
+        toast('success', 'Tarea agendada y en sincronización con Calendar.');
+        this.reset();
+        await loadTasks();
+    } catch (err) { toast('error', err.message); } finally { hideLoading(); }
+});
+
+// ─── Indexar docs ──────────────────────────────────────────────────
+document.getElementById('btn-reindex').addEventListener('click', async () => {
+    showLoading('Iniciando indexación de documentos...');
+    try {
+        await apiFetch('/api/documents/index', { method: 'POST' });
+        toast('info', 'Indexación iniciada en segundo plano.');
+    } catch (err) { toast('error', err.message); } finally { hideLoading(); }
+});
+
+// ─── Consultas Populares ───────────────────────────────────────────
+async function loadConsultas() {
+    try {
+        const data = await apiFetch('/api/consultas');
+        const list = document.getElementById('consultas-list');
+        if (!data.length) {
+            list.innerHTML = `<div class="empty-state"><i data-lucide="clipboard-list"></i><p>No hay consultas registradas aún.</p></div>`;
+            lucide.createIcons();
+            return;
+        }
+        
+        list.innerHTML = data.map(c => `
+            <div class="list-item" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div class="item-title">${escapeHTML(c.titulo)} <span class="badge" style="background:rgba(37,99,235,0.1);color:#60a5fa">${escapeHTML(c.estado)}</span></div>
+                    <div class="item-meta">Desde ${escapeHTML(c.fecha_inicio)} hasta ${escapeHTML(c.fecha_cierre)}</div>
+                </div>
+                <button class="btn" onclick="toast('info', 'Resultados en desarrollo')">Resultados</button>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    } catch (e) {
+        document.getElementById('consultas-list').innerHTML = `<div class="empty-state">Error cargando consultas</div>`;
+    }
+}
+
+document.getElementById('form-consulta').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    showLoading('Registrando consulta...');
+    try {
+        await apiFetch('/api/consultas', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                titulo: document.getElementById('cons-titulo').value,
+                descripcion: document.getElementById('cons-desc').value,
+                fecha_inicio: document.getElementById('cons-inicio').value,
+                fecha_cierre: document.getElementById('cons-cierre').value
+            })
+        });
+        toast('success', 'Consulta popular registrada.');
+        this.reset();
+        closeModal('modal-consulta');
+        await loadConsultas();
+    } catch (err) { toast('error', err.message); } finally { hideLoading(); }
+});
+
+document.getElementById('btn-nueva-consulta').addEventListener('click', () => {
+    document.getElementById('cons-inicio').value = new Date().toISOString().split('T')[0];
+    openModal('modal-consulta');
+});
+
+// ─── Actas de Elección ────────────────────────────────────────────
+let actaActualId = null;
+
+async function setupActasTab() {
+    await loadActasList();
+}
+
+document.getElementById('form-acta-upload').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const fileInput = document.getElementById('acta-pdf-input');
+    if (!fileInput.files.length) { toast('error', 'Selecciona un archivo PDF'); return; }
+
+    const btn = document.getElementById('btn-acta-upload');
+    btn.disabled = true;
+    document.getElementById('acta-upload-progress').style.display = 'block';
+    document.getElementById('acta-preview-container').style.display = 'none';
+
+    try {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        const res = await fetch(API + '/api/actas/upload', { method: 'POST', body: formData });
+        if (!res.ok) throw new Error((await res.json()).detail || 'Error al procesar el PDF');
+
+        const data = await res.json();
+        const d = data.datos;
+
+        actaActualId = d.acta_id;
+
+        // Mostrar preview
+        const preview = document.getElementById('acta-preview');
+        preview.innerHTML = `
+            <table class="table" style="font-size:12px;margin-bottom:12px">
+                <tr><td style="font-weight:600;padding:4px 8px;width:140px">Código Registro</td><td style="padding:4px 8px">${escapeHTML(d.codigo_registro) || '—'}</td></tr>
+                <tr><td style="font-weight:600;padding:4px 8px">Fecha</td><td style="padding:4px 8px">${escapeHTML(d.fecha_acta) || '—'}</td></tr>
+                <tr><td style="font-weight:600;padding:4px 8px">Consejo Comunal</td><td style="padding:4px 8px">${escapeHTML(d.nombre_consejo) || '—'}</td></tr>
+                <tr><td style="font-weight:600;padding:4px 8px">Sector</td><td style="padding:4px 8px">${escapeHTML(d.sector) || '—'}</td></tr>
+                <tr><td style="font-weight:600;padding:4px 8px">Archivo</td><td style="padding:4px 8px">${escapeHTML(d.filename) || '—'}</td></tr>
+            </table>
+            <h5 style="font-size:13px;font-weight:600;margin:12px 0 6px">Voceros Extraídos (${d.voceros.length})</h5>
+            <div style="max-height:300px;overflow:auto;border:1px solid var(--border);border-radius:6px">
+                <table class="table" style="font-size:12px">
+                    <thead><tr>
+                        <th style="padding:6px 8px;text-align:left">#</th>
+                        <th style="padding:6px 8px;text-align:left">Vocería</th>
+                        <th style="padding:6px 8px;text-align:left">Tipo</th>
+                        <th style="padding:6px 8px;text-align:left">Nombres y Apellidos</th>
+                        <th style="padding:6px 8px;text-align:left">C.I.</th>
+                        <th style="padding:6px 8px;text-align:left">Teléfono</th>
+                        <th style="padding:6px 8px;text-align:left">Votos</th>
+                    </tr></thead>
+                    <tbody>
+                        ${d.voceros.map((v, i) => `
+                            <tr>
+                                <td style="padding:4px 8px">${i + 1}</td>
+                                <td style="padding:4px 8px">${escapeHTML(v.voceria)}</td>
+                                <td style="padding:4px 8px"><span class="badge" style="background:${v.tipo === 'Principal' ? 'rgba(16,185,129,0.15);color:#34d399' : 'rgba(251,191,36,0.15);color:#fbbf24'}">${escapeHTML(v.tipo)}</span></td>
+                                <td style="padding:4px 8px">${escapeHTML(v.nombre)}</td>
+                                <td style="padding:4px 8px">${escapeHTML(v.cedula)}</td>
+                                <td style="padding:4px 8px">${escapeHTML(v.telefono) || ''}</td>
+                                <td style="padding:4px 8px">${escapeHTML(v.votos) || ''}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            ${d.ya_existe ? '<div style="margin-top:8px;padding:8px 12px;background:rgba(251,191,36,0.1);border-radius:6px;font-size:12px;color:#fbbf24"><i data-lucide="alert-triangle" style="width:14px;height:14px;vertical-align:middle"></i> Este código de registro ya existe en la base de datos.</div>' : ''}
+        `;
+
+        document.getElementById('btn-acta-save').style.display = d.ya_existe ? 'none' : 'inline-flex';
+        document.getElementById('btn-acta-otra').style.display = 'inline-flex';
+        document.getElementById('acta-preview-container').style.display = 'block';
+        lucide.createIcons();
+        toast('success', `PDF procesado: ${d.voceros.length} voceros encontrados`);
+    } catch (err) {
+        toast('error', err.message);
+    } finally {
+        btn.disabled = false;
+        document.getElementById('acta-upload-progress').style.display = 'none';
+    }
+});
+
+document.getElementById('btn-acta-save').addEventListener('click', async function () {
+    if (!actaActualId) { toast('error', 'No hay acta para guardar'); return; }
+
+    showLoading('Guardando acta en la base de datos...');
+    try {
+        const res = await apiFetch(`/api/actas/${actaActualId}/save`, { method: 'POST' });
+        toast('success', res.mensaje || 'Acta guardada exitosamente');
+        document.getElementById('btn-acta-save').style.display = 'none';
+        await loadActasList();
+    } catch (err) {
+        toast('error', err.message);
+    } finally {
+        hideLoading();
+    }
+});
+
+document.getElementById('btn-acta-otra').addEventListener('click', function () {
+    document.getElementById('acta-pdf-input').value = '';
+    document.getElementById('acta-preview-container').style.display = 'none';
+    document.getElementById('btn-acta-save').style.display = 'none';
+    document.getElementById('btn-acta-otra').style.display = 'none';
+    actaActualId = null;
+});
+
+async function loadActasList() {
+    try {
+        const data = await apiFetch('/api/actas');
+        const list = document.getElementById('actas-list');
+        if (!data.length) {
+            list.innerHTML = `<div class="empty-state">No hay actas registradas aún.</div>`;
+            return;
+        }
+        list.innerHTML = data.map(a => `
+            <div class="list-item">
+                <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+                    <div>
+                        <div class="item-title">${escapeHTML(a.nombre_consejo)} — ${escapeHTML(a.codigo_registro) || 'Sin código'}</div>
+                        <div class="item-meta">${escapeHTML(a.fecha_acta)} · ${escapeHTML(a.sector) || ''}</div>
+                    </div>
+                    <span style="font-size:11px;color:var(--txt-muted)">${new Date(a.created_at).toLocaleDateString()}</span>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) {
+        document.getElementById('actas-list').innerHTML = `<div class="empty-state">Error cargando actas</div>`;
+    }
+}
+
+// ─── Inicio ────────────────────────────────────────────────────────
+loadDashboard();
+loadTasks();
+loadLetterTypes();
+</script>
+</body>
+</html>

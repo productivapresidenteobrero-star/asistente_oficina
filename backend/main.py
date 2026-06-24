@@ -1,6 +1,7 @@
 import logging
 import os
 import asyncio
+import secrets
 from contextlib import asynccontextmanager
 from datetime import datetime, date
 from pathlib import Path
@@ -108,7 +109,8 @@ app.add_middleware(
 async def auth_middleware(request: Request, call_next):
     if API_KEY and request.url.path.startswith("/api/") and request.url.path != "/api/status":
         auth = request.headers.get("Authorization", "")
-        if not auth.startswith("Bearer ") or auth[7:] != API_KEY:
+        provided_key = auth[7:] if auth.startswith("Bearer ") else ""
+        if not secrets.compare_digest(provided_key, API_KEY):
             return JSONResponse(status_code=401, content={"detail": "API Key inválida o ausente"})
     return await call_next(request)
 
@@ -157,6 +159,8 @@ class NuevaTarea(BaseModel):
     descripcion: Optional[str] = ""
     fecha_limite: str # YYYY-MM-DD HH:MM
     recordatorio_dias: Optional[int] = 1
+    responsable: Optional[str] = None
+    consejo_id: Optional[int] = None
 
 # ============================================================
 # Endpoints de la API
@@ -198,11 +202,12 @@ async def get_dashboard_stats():
         )
         cartas_mes = (await c.fetchone())[0]
         
-        # Tareas pendientes
-        c = await db.execute(
-            "SELECT COUNT(*) FROM tareas WHERE completada=0"
-        )
+        # Tareas pendientes y vencidas
+        c = await db.execute("SELECT COUNT(*) FROM tareas WHERE completada=0")
         tareas_pendientes = (await c.fetchone())[0]
+
+        c = await db.execute("SELECT COUNT(*) FROM tareas WHERE completada=0 AND fecha_limite < ?", (hoy,))
+        tareas_vencidas = (await c.fetchone())[0]
         
         # Total documentos indexados
         c = await db.execute("SELECT COUNT(*) FROM documentos")
@@ -234,6 +239,7 @@ async def get_dashboard_stats():
         "participantes_mes": participantes_mes,
         "cartas_mes": cartas_mes,
         "tareas_pendientes": tareas_pendientes,
+        "tareas_vencidas": tareas_vencidas,
         "total_documentos": total_docs,
         "total_voceros": total_voceros,
         "total_consejos": total_consejos,
@@ -302,28 +308,45 @@ async def put_activity(act_id: int, act: EditarActividad):
 
 @app.post("/api/activities/upload-photo")
 async def upload_activity_photo(file: UploadFile = File(...)):
-    """Sube una foto de actividad y retorna la ruta local."""
+    """Sube una foto de actividad y retorna una ruta pública segura."""
     import uuid
-    
+    from io import BytesIO
+    from PIL import Image, UnidentifiedImageError
+
     MAX_SIZE = 10 * 1024 * 1024  # 10MB
     ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
-    
-    ext = Path(file.filename).suffix.lower()
+    ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+    IMAGE_FORMAT_EXTENSIONS = {"JPEG": ".jpg", "PNG": ".png", "WEBP": ".webp", "GIF": ".gif"}
+
+    ext = Path(file.filename or "").suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail=f"Extensión no permitida: {ext}. Usa: {', '.join(ALLOWED_EXTENSIONS)}")
-    
-    content = await file.read()
+        raise HTTPException(status_code=400, detail=f"Extensión no permitida: {ext}. Usa: {', '.join(sorted(ALLOWED_EXTENSIONS))}")
+
+    if file.content_type not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(status_code=400, detail="Tipo de contenido no permitido. Sube una imagen válida.")
+
+    content = await file.read(MAX_SIZE + 1)
     if len(content) > MAX_SIZE:
-        raise HTTPException(status_code=400, detail=f"Archivo demasiado grande (máx 10MB)")
-    
-    unique_id = uuid.uuid4().hex[:6]
+        raise HTTPException(status_code=400, detail="Archivo demasiado grande (máx 10MB)")
+
+    try:
+        image = Image.open(BytesIO(content))
+        image.verify()
+        detected_ext = IMAGE_FORMAT_EXTENSIONS.get(image.format)
+    except (UnidentifiedImageError, OSError):
+        raise HTTPException(status_code=400, detail="El archivo no es una imagen válida")
+
+    if detected_ext is None or (ext == ".jpeg" and detected_ext != ".jpg") or (ext != ".jpeg" and ext != detected_ext):
+        raise HTTPException(status_code=400, detail="La extensión no coincide con el contenido de la imagen")
+
+    unique_id = uuid.uuid4().hex[:12]
     filename = f"web_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{unique_id}{ext}"
     filepath = MEDIA_PATH / filename
-    
+
     with open(filepath, "wb") as buffer:
         buffer.write(content)
-        
-    return {"filepath": str(filepath.resolve())}
+
+    return {"filepath": f"/media/{filename}", "filename": filename}
 
 @app.get("/api/activities/categories")
 async def get_categories():
@@ -439,9 +462,13 @@ async def api_buscar_en_carpeta(request: Request):
             raise HTTPException(status_code=400, detail="Se requiere el campo 'query'")
         if not carpeta:
             raise HTTPException(status_code=400, detail="Se requiere el campo 'carpeta'")
+        carpeta_resuelta = Path(carpeta).expanduser().resolve()
+        documentos_resueltos = DOCUMENTOS_PATH.expanduser().resolve()
+        if carpeta_resuelta != documentos_resueltos and documentos_resueltos not in carpeta_resuelta.parents:
+            raise HTTPException(status_code=403, detail="La carpeta debe estar dentro del directorio de documentos configurado")
         resultado = await buscar_en_carpeta(
             query=query,
-            carpeta=Path(carpeta).resolve(),
+            carpeta=carpeta_resuelta,
             extensiones=body.get("extensiones"),
         )
         return resultado
@@ -495,10 +522,10 @@ async def post_task(task: NuevaTarea, background_tasks: BackgroundTasks):
     async with await get_db() as db:
         cursor = await db.execute(
             """
-            INSERT INTO tareas (titulo, descripcion, fecha_limite, recordatorio_dias)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO tareas (titulo, descripcion, fecha_limite, recordatorio_dias, responsable, consejo_id)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (task.titulo, task.descripcion, task.fecha_limite, task.recordatorio_dias)
+            (task.titulo, task.descripcion, task.fecha_limite, task.recordatorio_dias, task.responsable, task.consejo_id)
         )
         await db.commit()
         
@@ -510,9 +537,10 @@ async def post_task(task: NuevaTarea, background_tasks: BackgroundTasks):
 async def complete_task(task_id: int):
     """Marca una tarea como completada."""
     async with await get_db() as db:
-        await db.execute("UPDATE tareas SET completada = 1 WHERE id = ?", (task_id,))
+        await db.execute("UPDATE tareas SET completada = 1, estado = 'completada' WHERE id = ?", (task_id,))
         await db.commit()
     return {"message": "Tarea marcada como completada."}
+
 
 # Servir Frontend
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"

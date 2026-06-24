@@ -3,6 +3,9 @@ import aiosqlite
 import json
 from datetime import datetime
 from backend.config import DATABASE_PATH, CATEGORIAS_ACTIVIDADES
+import logging
+
+logger = logging.getLogger("database")
 
 from contextlib import asynccontextmanager
 
@@ -238,6 +241,26 @@ async def init_db():
                 logger.info("Migración v1: UNIQUE de cedula eliminado y datos deduplicados")
 
             await db.execute("INSERT OR IGNORE INTO schema_version (version) VALUES (1)")
+
+        if current_ver < 2:
+            # v2: tracking de compromisos en tareas
+            for col_sql in [
+                "ALTER TABLE tareas ADD COLUMN responsable TEXT",
+                "ALTER TABLE tareas ADD COLUMN consejo_id INTEGER REFERENCES consejos_comunales(id)",
+                "ALTER TABLE tareas ADD COLUMN estado TEXT DEFAULT 'pendiente'",
+            ]:
+                try:
+                    await db.execute(col_sql)
+                except Exception:
+                    pass
+            
+            try:
+                await db.execute("UPDATE tareas SET estado = 'completada' WHERE completada = 1")
+            except Exception:
+                pass
+
+            await db.execute("INSERT OR IGNORE INTO schema_version (version) VALUES (2)")
+            logger.info("Migración v2: Campos de seguimiento agregados a tareas")
 
         # Safe column additions for cartas (always run, fail silently if exists)
         for col_sql in [
